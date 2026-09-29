@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 06 | MongoDB & Mongoose Schemas</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">06</div>
+      <span>Lesson 06: MongoDB & Mongoose</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-05/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 05</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-07/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 07 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-backend">Module 2 &bull; Class 06 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">The Database (MongoDB & Mongoose)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Learn how collections and documents work in cloud MongoDB Atlas, design strict Mongoose schemas, and guard environment secrets.
+      </p>
+    </div>
+
+    <!-- Interactive Schema Simulator -->
+    <div class="section-block">
+      <h2>🧬 Interactive Schema & Document Generator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Toggle schema rules on the left to see how Mongoose transforms and validates the document stored in MongoDB:
+      </p>
+
+      <div class="sim-container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.8rem;">SCHEMA CONFIGURATION (models/Task.js):</div>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkTimestamps" checked onchange="updateDoc()"> Enable Timestamps (`createdAt`, `updatedAt`)
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkDefault" checked onchange="updateDoc()"> Set `completed` default to `false`
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkPriority" onchange="updateDoc()"> Add `priority` field (Enum: 'low' | 'high')
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.8rem;">MONGODB ATLAS STORED DOCUMENT:</div>
+            <div id="mongoDocView" style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.82rem; color: #38bdf8; min-height: 140px; line-height: 1.5;">
+              // Generated Document
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 Mongoose Schema Validation Pipeline</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart LR
+    Incoming[Incoming req.body JSON] --> Validator{Mongoose Validator}
+    Validator -->|Matches Schema Types| Atlas[(MongoDB Atlas Cloud)]
+    Validator -->|Fails Type or Missing Required| Error[400 Bad Request: ValidationError]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        backend/<br>
+        ├── config/<br>
+        │   └── <span class="highlight">db.js</span> <span class="desc">← mongoose.connect(process.env.MONGO_URI)</span><br>
+        ├── models/<br>
+        │   └── <span class="highlight">Task.js</span> <span class="desc">← Mongoose Schema definition & model export</span><br>
+        ├── <span class="highlight">.env</span> <span class="desc">← CRITICAL: Secrets (MONGO_URI) hidden from Git</span><br>
+        └── <span>.gitignore</span> <span class="desc">← Must list .env and node_modules</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Mongoose Model with Validation</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt6')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt6">I am building a MERN stack application.
+Please create a Mongoose model file at `server/models/Product.js`.
+
+Requirements:
+- Fields:
+  - `name`: String, required, trimmed, max 100 characters.
+  - `price`: Number, required, minimum 0.
+  - `category`: String, required, enum restricted to: ['Electronics', 'Clothing', 'Books', 'Home'].
+  - `inStock`: Boolean, default true.
+  - `description`: String, optional.
+- Enable automatic timestamps (`createdAt`, `updatedAt`).
+- Export the compiled model.
+- Show me how to test connecting to MongoDB in `server/config/db.js`.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">NoSQL Database</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A non-relational database that stores data as flexible, JSON-like documents rather than rigid tables with rows and columns.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Document</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A single record in a MongoDB collection (analogous to a row in SQL or a single JSON object), automatically assigned a unique `_id`.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Collection</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A grouped folder of documents inside MongoDB (analogous to a table in SQL, e.g. the "users" collection or "products" collection).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">ObjectId</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A unique 24-character hexadecimal identifier automatically generated by MongoDB for every single document to guarantee uniqueness.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Mongoose</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An ODM (Object Data Modeling) library for Node.js and MongoDB that acts as a strict building inspector, enforcing schemas, data types, and validations.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Schema</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The blueprint that defines the shape, rules, required fields, and default values of documents in a Mongoose collection.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Model</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The compiled constructor compiled from a Schema that provides methods to create, query, update, and delete documents (e.g. `User.find()`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Environment Variables (`.env`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Hidden system variables stored outside your source code used to keep private passwords, database URIs, and secret keys safe from being published to GitHub.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Collections & Documents:</strong> A Collection is a folder of records; each record is a JSON-like Document with a unique `_id`.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Mongoose is the Guard:</strong> It enforces schemas so bad or incomplete data cannot corrupt your database.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>`.env` Protection:</strong> Never commit passwords or `MONGO_URI` to GitHub. Always put `.env` inside `.gitignore`.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function updateDoc() {
+      const ts = document.getElementById('chkTimestamps').checked;
+      const def = document.getElementById('chkDefault').checked;
+      const prio = document.getElementById('chkPriority').checked;
+
+      let doc = `{\n  "_id": "660fa1b8492d50e8a83b291a",\n  "title": "Build MERN Webapp"`;
+      
+      if (def) {
+        doc += `,\n  "completed": false`;
+      }
+      if (prio) {
+        doc += `,\n  "priority": "high"`;
+      }
+      if (ts) {
+        doc += `,\n  "createdAt": "2026-09-29T12:00:00.000Z",\n  "updatedAt": "2026-09-29T12:00:00.000Z"`;
+      }
+      doc += `\n}`;
+
+      document.getElementById('mongoDocView').innerText = doc;
+    }
+
+    updateDoc();
+  </script>
+</body>
+</html>

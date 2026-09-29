@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 15 | Capstone Architecture & PRD</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">15</div>
+      <span>Lesson 15: Capstone PRD</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-14/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 14</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-16/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 16 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-fullstack">Module 4 &bull; Class 15 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Capstone Architecture & PRD Prompting</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Transition from a code typist to a System Architect. Define schemas, API contracts, and user flows before generating code.
+      </p>
+    </div>
+
+    <!-- Interactive PRD Generator -->
+    <div class="section-block">
+      <h2>📋 Interactive Architecture Blueprint Generator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Select a Capstone project archetype below to generate its complete technical specification:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <button class="btn btn-primary" onclick="loadSpec('job')">Project 1: Tech Job Board</button>
+          <button class="btn btn-secondary" onclick="loadSpec('store')">Project 2: Creator Marketplace</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+          
+          <div style="background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem;">1. DATABASE SCHEMAS</div>
+            <div id="specDb" style="font-family: var(--font-mono); font-size: 0.78rem; color: #cbd5e1; line-height: 1.6;">
+              <!-- Dynamic DB -->
+            </div>
+          </div>
+
+          <div style="background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="color: var(--accent-emerald); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem;">2. API ENDPOINTS</div>
+            <div id="specApi" style="font-family: var(--font-mono); font-size: 0.78rem; color: #cbd5e1; line-height: 1.6;">
+              <!-- Dynamic API -->
+            </div>
+          </div>
+
+          <div style="background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="color: var(--accent-purple); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem;">3. FRONTEND COMPONENTS</div>
+            <div id="specUi" style="font-family: var(--font-mono); font-size: 0.78rem; color: #cbd5e1; line-height: 1.6;">
+              <!-- Dynamic UI -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The End-to-End System Blueprint</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+graph LR
+    subgraph UI ["Client UI Layer"]
+        Feed["JobFeedPage.jsx"]
+        Modal["PostJobModal.jsx"]
+    end
+
+    subgraph API ["Express REST Layer"]
+        R1["GET /api/jobs"]
+        R2["POST /api/jobs (Protected)"]
+    end
+
+    subgraph DB ["MongoDB Atlas Layer"]
+        ModelJob[Job Model: title, company, salary]
+        ModelUser[User Model: name, email, role]
+    end
+
+    Feed --> R1 --> ModelJob
+    Modal --> R2 --> ModelJob
+    ModelJob -.->|Ref: author| ModelUser
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        my-capstone-project/<br>
+        ├── docs/<br>
+        │   ├── <span class="highlight">PRD.md</span> <span class="desc">← Product requirements, user stories & scope limits</span><br>
+        │   └── <span class="highlight">API_SPEC.md</span> <span class="desc">← Contract defining all route URLs, methods & payloads</span><br>
+        ├── client/ <span class="desc">← Vite + React frontend</span><br>
+        └── server/ <span class="desc">← Express + Mongoose backend</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Architectural PRD Blueprint</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt15')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt15">I want to build a MERN stack capstone project: "A Tech Job Board with Employer Posting and Applicant Tracking".
+
+Please act as a Principal Full-Stack Software Architect and generate:
+1. Database Models (Mongoose):
+   - Provide exact schema definitions for `User` and `Job`.
+2. REST API Specification:
+   - Provide a table of all endpoints, HTTP verbs, controller names, and whether auth protection is required.
+3. Frontend Page & Component Tree:
+   - Break down the React screens into modular components.
+4. Step-by-Step Build Order:
+   - List the 5 sequential phases to build and verify this app without getting overwhelmed.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">PRD (Product Requirements Document)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A comprehensive blueprint describing what problem a product solves, who will use it, the full list of features, and technical constraints before coding.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">User Story</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A feature description written from the perspective of an end-user: "As a [user type], I want to [action], so that I can [benefit]".</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Data Modeling</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The architectural process of defining which data entities exist, what fields they contain, and how they reference each other in a database.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">API Specification (Contract)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A formal table documenting every endpoint URL, supported HTTP verb, required headers, request payloads, and expected status codes.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Scope Creep</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The dangerous tendency for a software project to continuously expand with unplanned features, leading to unfinished, buggy applications.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">MVP (Minimum Viable Product)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The simplest, most focused version of a product that successfully delivers its core value proposition to users.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Spec Before Code:</strong> Vague prompts produce broken code. When you specify schemas and routes first, AI outputs flawless code.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The 3 Layers:</strong> Every feature must be planned across Database Models ➔ Express Endpoints ➔ React Components.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Scope Control:</strong> Build a polished core loop with 3 great features rather than a broken app with 20 half-finished buttons.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function loadSpec(type) {
+      const db = document.getElementById('specDb');
+      const api = document.getElementById('specApi');
+      const ui = document.getElementById('specUi');
+
+      if (type === 'job') {
+        db.innerHTML = `
+&bull; <strong>User:</strong> name, email, password, role ('employer' | 'candidate')<br><br>
+&bull; <strong>Job:</strong> title, company, location, salary, tags, userRef (ObjectId)
+        `;
+        api.innerHTML = `
+&bull; <code>GET /api/jobs</code> (Public list)<br>
+&bull; <code>POST /api/jobs</code> (Auth required)<br>
+&bull; <code>GET /api/jobs/:id</code> (Public details)<br>
+&bull; <code>DELETE /api/jobs/:id</code> (Owner only)
+        `;
+        ui.innerHTML = `
+&bull; <code>HomePage</code> (Hero + Search)<br>
+&bull; <code>JobCard</code> (Reusable item)<br>
+&bull; <code>PostJobModal</code> (Controlled form)<br>
+&bull; <code>EmployerDashboard</code> (Private)
+        `;
+      } else {
+        db.innerHTML = `
+&bull; <strong>User:</strong> name, email, password, walletBalance<br><br>
+&bull; <strong>Product:</strong> title, description, price, downloadUrl, authorRef
+        `;
+        api.innerHTML = `
+&bull; <code>GET /api/products</code> (Catalog)<br>
+&bull; <code>POST /api/products</code> (Seller auth)<br>
+&bull; <code>POST /api/checkout</code> (Buy item)<br>
+&bull; <code>GET /api/user/library</code> (Purchased)
+        `;
+        ui.innerHTML = `
+&bull; <code>StorePage</code> (Product grid)<br>
+&bull; <code>ProductCard</code> (Price + Buy button)<br>
+&bull; <code>CartDrawer</code> (Checkout summary)<br>
+&bull; <code>MyLibraryPage</code> (Download links)
+        `;
+      }
+    }
+
+    loadSpec('job');
+  </script>
+</body>
+</html>

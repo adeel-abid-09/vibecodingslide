@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERN AI Bootcamp | Master Instructor Cockpit</title>
+  <link rel="stylesheet" href="styles/common.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="scripts/lesson-data.js"></script>
+  <script src="scripts/fullscreen.js"></script>
+  <style>
+    /* Cockpit Specific Layout */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .cockpit-layout {
+      display: flex;
+      height: calc(100vh - 65px);
+      position: relative;
+    }
+
+    /* Sidebar */
+    .cockpit-sidebar {
+      width: 340px;
+      min-width: 340px;
+      background: rgba(13, 18, 29, 0.95);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+
+    .cockpit-sidebar.collapsed {
+      margin-left: -340px;
+    }
+
+    .sidebar-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lesson-scroll-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .module-heading {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      padding: 0.75rem 0.5rem 0.3rem;
+    }
+
+    .lesson-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .lesson-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .lesson-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .lesson-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+
+    .lesson-item.active .lesson-num {
+      background: var(--accent-indigo);
+      color: #fff;
+    }
+
+    .lesson-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+    }
+
+    /* Main Stage */
+    .cockpit-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sub-nav control bar */
+    .stage-toolbar {
+      padding: 0.6rem 1.5rem;
+      background: rgba(10, 13, 20, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tab-group {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      padding: 0.35rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-indigo);
+      color: #fff;
+    }
+
+    /* Content Viewports */
+    .stage-viewport {
+      flex: 1;
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
+
+    iframe.deck-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: var(--bg-primary);
+    }
+
+    .markdown-view {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 2.5rem;
+      background: #0a0d14;
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .markdown-view h1 { font-size: 2.2rem; margin-bottom: 1rem; color: #fff; }
+    .markdown-view h2 { font-size: 1.5rem; margin: 1.8rem 0 0.8rem; color: var(--accent-cyan); }
+    .markdown-view h3 { font-size: 1.2rem; margin: 1.4rem 0 0.6rem; color: #fff; }
+    .markdown-view p { color: #cbd5e1; margin-bottom: 1rem; line-height: 1.7; }
+    .markdown-view ul, .markdown-view ol { margin-left: 1.5rem; margin-bottom: 1rem; color: #cbd5e1; }
+    .markdown-view li { margin-bottom: 0.5rem; }
+    .markdown-view pre { background: #030712; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); overflow-x: auto; margin: 1rem 0; }
+    .markdown-view code { font-family: var(--font-mono); color: #38bdf8; font-size: 0.88rem; }
+    .markdown-view hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+
+    /* Modal / Drawer for Cheat Sheets */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 850px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .close-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="header-bar" style="height: 65px; padding: 0.75rem 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <button id="toggleSidebarBtn" class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 0.4rem 0.7rem; font-size: 0.85rem;" title="Toggle Sidebar (S)">
+        ☰ Lessons
+      </button>
+      <a href="#" class="logo-badge">
+        <div class="logo-icon">⚡</div>
+        <span style="font-size: 1.1rem;">MERN AI Bootcamp <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 500; border: 1px solid rgba(6,182,212,0.3); padding: 2px 6px; border-radius: 4px; margin-left: 6px;">Teacher Cockpit</span></span>
+      </a>
+    </div>
+
+    <!-- Quick Drawers for Teaching -->
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <button class="btn btn-secondary" onclick="openModal('glossary')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); color: #c7d2fe;">
+        📖 Tech Dictionary
+      </button>
+      <button class="btn btn-secondary" onclick="openModal('where')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+        🗺️ Where Does It Go?
+      </button>
+      <button class="btn btn-secondary" onclick="openModal('prompts')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+        🤖 AI Prompts
+      </button>
+      <button class="btn btn-secondary" onclick="openModal('debug')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+        🔍 Debugging
+      </button>
+      
+      <!-- Lesson Navigator -->
+      <div style="display: flex; align-items: center; gap: 0.3rem; margin-left: 0.5rem; border-left: 1px solid var(--border-color); padding-left: 0.8rem;">
+        <button id="prevBtn" class="btn btn-secondary" onclick="prevLesson()" style="padding: 0.4rem 0.7rem; font-size: 0.8rem;" title="Previous Lesson (Left Arrow)">◀</button>
+        <span id="lessonCounter" style="font-family: var(--font-mono); font-size: 0.8rem; color: #fff; min-width: 50px; text-align: center;">01 / 18</span>
+        <button id="nextBtn" class="btn btn-primary" onclick="nextLesson()" style="padding: 0.4rem 0.7rem; font-size: 0.8rem;" title="Next Lesson (Right Arrow)">▶</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cockpit Container -->
+  <div class="cockpit-layout">
+    
+    <!-- Sidebar: All 18 Lessons -->
+    <aside id="sidebar" class="cockpit-sidebar">
+      <div class="sidebar-header">
+        <span style="font-weight: 700; font-size: 0.85rem; color: #fff;">COURSE SYLLABUS</span>
+        <span style="font-size: 0.75rem; color: var(--accent-emerald);">18 Classes Ready</span>
+      </div>
+
+      <div class="lesson-scroll-list" id="lessonList">
+        <!-- Dynamically generated lesson list items -->
+      </div>
+    </aside>
+
+    <!-- Main Stage Viewport -->
+    <main class="cockpit-stage">
+      
+      <!-- Stage Toolbar -->
+      <div class="stage-toolbar">
+        <div>
+          <span id="activeClassTag" class="card-tag tag-foundation" style="margin-bottom: 0; padding: 0.2rem 0.5rem; font-size: 0.7rem;">Module 1</span>
+          <strong id="activeLessonTitle" style="color: #fff; margin-left: 0.5rem; font-size: 0.95rem;">01. How the Web Works & AI Setup</strong>
+        </div>
+
+        <!-- View Switcher Tabs & Fullscreen -->
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div class="tab-group">
+            <button id="tabVisualizer" class="tab-btn active" onclick="switchView('visualizer')">
+              🖥️ Interactive Deck & Visuals
+            </button>
+            <button id="tabNotes" class="tab-btn" onclick="switchView('notes')">
+              📖 Teacher Plan & Script
+            </button>
+          </div>
+
+          <button id="toggleFullscreenBtn" class="btn btn-fullscreen" onclick="toggleCockpitFullscreen()" title="Fullscreen Presentation Mode (F)" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;">
+            <span>⛶</span> <span>Fullscreen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stage Viewports -->
+      <div class="stage-viewport">
+        <!-- Mode A: Interactive Deck (Visualizer HTML) -->
+        <iframe id="deckIframe" class="deck-frame" src="lessons/lesson-01/visualizer.html" allow="fullscreen" allowfullscreen="true"></iframe>
+
+        <!-- Mode B: Teacher Lesson Plan Markdown View -->
+        <div id="notesContainer" class="markdown-view">
+          <div id="markdownContent">Loading lesson plan notes...</div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Global Modal for Cheat Sheets -->
+  <div id="cheatSheetModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color: #fff; font-size: 1.15rem;">Cheat Sheet</h3>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body">
+        Loading content...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Complete 18-Class Database
+    const lessons = [
+      { num: "01", id: "lesson-01", title: "How Web Works & AI Setup", mod: "Module 1: Foundations", tag: "tag-foundation" },
+      { num: "02", id: "lesson-02", title: "Visual Anatomy (HTML & CSS)", mod: "Module 1: Foundations", tag: "tag-foundation" },
+      { num: "03", id: "lesson-03", title: "JS as System Glue (Data Shapes)", mod: "Module 1: Foundations", tag: "tag-foundation" },
+      
+      { num: "04", id: "lesson-04", title: "Backend Model & Express Server", mod: "Module 2: Backend", tag: "tag-backend" },
+      { num: "05", id: "lesson-05", title: "REST APIs & HTTP Language", mod: "Module 2: Backend", tag: "tag-backend" },
+      { num: "06", id: "lesson-06", title: "MongoDB & Mongoose Schemas", mod: "Module 2: Backend", tag: "tag-backend" },
+      { num: "07", id: "lesson-07", title: "Database CRUD (MVC Pattern)", mod: "Module 2: Backend", tag: "tag-backend" },
+      { num: "08", id: "lesson-08", title: "Auth & Security (JWT & Bcrypt)", mod: "Module 2: Backend", tag: "tag-backend" },
+      
+      { num: "09", id: "lesson-09", title: "React Thinking & Components", mod: "Module 3: Frontend", tag: "tag-frontend" },
+      { num: "10", id: "lesson-10", title: "State & Interactivity (useState)", mod: "Module 3: Frontend", tag: "tag-frontend" },
+      { num: "11", id: "lesson-11", title: "Fetching Real Data (useEffect)", mod: "Module 3: Frontend", tag: "tag-frontend" },
+      { num: "12", id: "lesson-12", title: "Multi-Page Navigation (Router)", mod: "Module 3: Frontend", tag: "tag-frontend" },
+      { num: "13", id: "lesson-13", title: "Frontend Auth & Protected Routes", mod: "Module 3: Frontend", tag: "tag-frontend" },
+      
+      { num: "14", id: "lesson-14", title: "Full-Stack Handshake & CORS", mod: "Module 4: Full-Stack", tag: "tag-fullstack" },
+      { num: "15", id: "lesson-15", title: "Capstone Architecture & PRD", mod: "Module 4: Full-Stack", tag: "tag-fullstack" },
+      { num: "16", id: "lesson-16", title: "Live Capstone Assembly & Search", mod: "Module 4: Full-Stack", tag: "tag-fullstack" },
+      
+      { num: "17", id: "lesson-17", title: "Modern Debugging Masterclass", mod: "Module 5: Deploy", tag: "tag-deploy" },
+      { num: "18", id: "lesson-18", title: "Going Live & Demo Day!", mod: "Module 5: Deploy", tag: "tag-deploy" }
+    ];
+
+    let currentIndex = 0;
+    let currentView = 'visualizer';
+
+    // Build Sidebar
+    function buildSidebar() {
+      const list = document.getElementById('lessonList');
+      list.innerHTML = '';
+      let currentModule = '';
+
+      lessons.forEach((l, idx) => {
+        if (l.mod !== currentModule) {
+          currentModule = l.mod;
+          const h = document.createElement('div');
+          h.className = 'module-heading';
+          h.innerText = currentModule;
+          list.appendChild(h);
+        }
+
+        const item = document.createElement('button');
+        item.className = `lesson-item ${idx === currentIndex ? 'active' : ''}`;
+        item.id = `lesson-btn-${idx}`;
+        item.onclick = () => selectLesson(idx);
+
+        item.innerHTML = `
+          <div class="lesson-num">${l.num}</div>
+          <div class="lesson-name">${l.title}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // Select Lesson
+    function selectLesson(idx) {
+      if (idx < 0 || idx >= lessons.length) return;
+      currentIndex = idx;
+      const l = lessons[currentIndex];
+
+      // Update Active class in sidebar
+      document.querySelectorAll('.lesson-item').forEach((b, i) => {
+        b.classList.toggle('active', i === currentIndex);
+      });
+
+      // Update Header info
+      document.getElementById('lessonCounter').innerText = `${l.num} / 18`;
+      document.getElementById('activeLessonTitle').innerText = `${l.num}. ${l.title}`;
+      const tag = document.getElementById('activeClassTag');
+      tag.innerText = l.mod;
+      tag.className = `card-tag ${l.tag}`;
+
+      // Update Viewport
+      const iframe = document.getElementById('deckIframe');
+      iframe.src = `lessons/${l.id}/visualizer.html`;
+
+      // Load Markdown notes
+      loadMarkdownNotes(l.id);
+
+      // Save State
+      localStorage.setItem('mern_active_lesson', currentIndex);
+    }
+
+    function prevLesson() {
+      if (currentIndex > 0) selectLesson(currentIndex - 1);
+    }
+
+    function nextLesson() {
+      if (currentIndex < lessons.length - 1) selectLesson(currentIndex + 1);
+    }
+
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      sb.classList.toggle('collapsed');
+    }
+
+    // Switch View (Visualizer vs Notes)
+    function switchView(view) {
+      currentView = view;
+      const iframe = document.getElementById('deckIframe');
+      const notes = document.getElementById('notesContainer');
+      const bVis = document.getElementById('tabVisualizer');
+      const bNot = document.getElementById('tabNotes');
+
+      if (view === 'visualizer') {
+        iframe.style.display = 'block';
+        notes.style.display = 'none';
+        bVis.classList.add('active');
+        bNot.classList.remove('active');
+      } else {
+        iframe.style.display = 'none';
+        notes.style.display = 'block';
+        bVis.classList.remove('active');
+        bNot.classList.add('active');
+      }
+    }
+
+    // Load Markdown Plan (Works with file:// protocol and offline)
+    async function loadMarkdownNotes(lessonId) {
+      const container = document.getElementById('markdownContent');
+      let markdownText = '';
+
+      // 1. Direct memory check (Solves file:// browser restrictions completely)
+      if (window.LESSON_DATA && window.LESSON_DATA[lessonId]) {
+        markdownText = window.LESSON_DATA[lessonId];
+      } else {
+        // Fallback to fetch if running via web server
+        try {
+          const res = await fetch(`lessons/${lessonId}/README.md`);
+          if (res.ok) markdownText = await res.text();
+        } catch (e) {
+          console.warn('Local fetch unavailable');
+        }
+      }
+
+      if (markdownText) {
+        if (window.marked) {
+          container.innerHTML = marked.parse(markdownText);
+        } else {
+          container.innerHTML = `<pre style="white-space: pre-wrap;">${markdownText}</pre>`;
+        }
+      } else {
+        container.innerHTML = `<p style="color: var(--accent-rose);">Could not load lesson plan README.md automatically. View file directly at: <code>lessons/${lessonId}/README.md</code></p>`;
+      }
+    }
+
+    // Keyboard Shortcuts (Arrow Left, Arrow Right, S for Sidebar, F for Fullscreen)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') nextLesson();
+      if (e.key === 'ArrowLeft') prevLesson();
+      if (e.key.toLowerCase() === 's') toggleSidebar();
+      if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        toggleCockpitFullscreen();
+      }
+    });
+
+    // Toggle Cockpit Fullscreen
+    function toggleCockpitFullscreen() {
+      const stageViewport = document.querySelector('.stage-viewport');
+      const iframe = document.getElementById('deckIframe');
+      const fsBtn = document.getElementById('toggleFullscreenBtn');
+
+      // If in visualizer view and iframe is ready, toggle the active simulator inside iframe
+      if (currentView === 'visualizer' && iframe && iframe.contentWindow) {
+        try {
+          if (iframe.contentWindow.toggleInteractiveFullscreen) {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            const primary = doc.getElementById('interactiveSimulatorBlock') || doc.querySelector('.section-block.flagship-simulator, .section-block:has(.sim-container), .section-block');
+            if (primary) {
+              iframe.contentWindow.toggleInteractiveFullscreen(primary);
+              return;
+            }
+          }
+        } catch (e) {
+          // If cross-origin or frame access blocked, fall back to stage fullscreen
+        }
+      }
+
+      // Native stage fullscreen fallback
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+        if (fsBtn) {
+          fsBtn.classList.remove('active');
+          fsBtn.innerHTML = '<span>⛶</span> <span>Fullscreen</span>';
+        }
+      } else {
+        if (stageViewport.requestFullscreen) {
+          stageViewport.requestFullscreen().catch(() => {});
+          if (fsBtn) {
+            fsBtn.classList.add('active');
+            fsBtn.innerHTML = '<span>🗗</span> <span>Exit Fullscreen</span>';
+          }
+        }
+      }
+    }
+
+    // Listen for messages from inside iframe
+    window.addEventListener('message', (e) => {
+      const fsBtn = document.getElementById('toggleFullscreenBtn');
+      if (!fsBtn) return;
+      if (e.data && e.data.type === 'INTERACTIVE_FULLSCREEN_ENTER') {
+        fsBtn.classList.add('active');
+        fsBtn.innerHTML = '<span>🗗</span> <span>Exit Fullscreen</span>';
+      } else if (e.data && e.data.type === 'INTERACTIVE_FULLSCREEN_EXIT') {
+        fsBtn.classList.remove('active');
+        fsBtn.innerHTML = '<span>⛶</span> <span>Fullscreen</span>';
+      }
+    });
+
+    // Cheat Sheet Modals (Works with file:// protocol and offline)
+    async function openModal(type) {
+      const modal = document.getElementById('cheatSheetModal');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+      modal.style.display = 'flex';
+
+      let file = '';
+      if (type === 'glossary') {
+        title.innerText = '📖 The MERN Beginner Tech Dictionary (All Lessons)';
+        let html = '<div style="margin-bottom: 1.25rem;"><input type="text" id="glossarySearch" placeholder="Type to search any term (e.g. JWT, CORS, Prop, Middleware, State, ObjectId)..." oninput="filterGlossary()" style="width: 100%; background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.9rem; font-family: var(--font-sans);"></div>';
+        html += '<div id="glossaryContainer" style="display: flex; flex-direction: column; gap: 1.5rem;">';
+        
+        for (const [lid, terms] of Object.entries(window.GLOSSARY || {})) {
+          const lObj = lessons.find(l => l.id === lid);
+          const lTitle = lObj ? `${lObj.num}. ${lObj.title} (${lObj.mod})` : lid;
+          html += `<div class="glossary-lesson-group">
+            <h4 style="color: var(--accent-cyan); margin-bottom: 0.6rem; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">${lTitle}</h4>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 0.6rem;">`;
+          for (const [term, def] of terms) {
+            html += `<div class="glossary-term-item" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 8px;">
+              <strong style="color: #fff; font-size: 0.92rem; display: block; margin-bottom: 0.25rem;">${term}</strong>
+              <p style="color: var(--text-muted); font-size: 0.83rem; line-height: 1.6;">${def}</p>
+            </div>`;
+          }
+          html += `</div></div>`;
+        }
+        html += '</div>';
+        body.innerHTML = html;
+        return;
+      } else if (type === 'where') {
+        title.innerText = '🗺️ "Where Does It Go?" Placement Matrix';
+        file = 'cheat-sheets/where-does-it-go.md';
+      } else if (type === 'prompts') {
+        title.innerText = '🤖 AI Prompting Recipes Guide';
+        file = 'cheat-sheets/ai-prompting-guide.md';
+      } else if (type === 'debug') {
+        title.innerText = '🔍 4-Layer Debugging Handbook';
+        file = 'cheat-sheets/debugging-handbook.md';
+      }
+
+      // Check bundled cheat sheets first
+      let mdText = '';
+      if (window.CHEAT_SHEETS && window.CHEAT_SHEETS[type]) {
+        mdText = window.CHEAT_SHEETS[type];
+      } else {
+        try {
+          const res = await fetch(file);
+          if (res.ok) mdText = await res.text();
+        } catch (e) {
+          console.warn('Local fetch unavailable');
+        }
+      }
+
+      if (mdText) {
+        if (window.marked) {
+          body.innerHTML = marked.parse(mdText);
+        } else {
+          body.innerHTML = `<pre style="white-space: pre-wrap;">${mdText}</pre>`;
+        }
+      } else {
+        body.innerHTML = `<p>Failed to load ${file}. You can open it directly in VS Code.</p>`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('cheatSheetModal').style.display = 'none';
+    }
+
+    window.filterGlossary = function() {
+      const q = document.getElementById('glossarySearch').value.toLowerCase().trim();
+      const items = document.querySelectorAll('.glossary-term-item');
+      items.forEach(it => {
+        const text = it.innerText.toLowerCase();
+        it.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    };
+
+    // Initialize
+    const saved = localStorage.getItem('mern_active_lesson');
+    if (saved !== null) {
+      currentIndex = parseInt(saved, 10) || 0;
+    }
+    buildSidebar();
+    selectLesson(currentIndex);
+  </script>
+</body>
+</html>

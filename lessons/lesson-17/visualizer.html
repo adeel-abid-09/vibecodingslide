@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 17 | Modern Debugging Masterclass</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    /* Full Chrome DevTools Simulation */
+    .devtools-window {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .devtools-tabs {
+      background: #0f1523;
+      padding: 0.4rem 0.8rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+    }
+
+    .dt-tab {
+      color: var(--text-muted);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .dt-tab.active {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      font-weight: 700;
+    }
+
+    .error-entry {
+      background: rgba(244, 63, 94, 0.1);
+      border-left: 4px solid #f43f5e;
+      padding: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #fca5a5;
+      margin-bottom: 0.6rem;
+      border-radius: 0 6px 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">17</div>
+      <span>Lesson 17: Debugging Masterclass</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-16/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 16</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-18/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 18 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-deploy">Module 5 &bull; Class 17 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Modern Debugging Masterclass (Never Stay Stuck)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the 4-layer detective framework, read stack traces with confidence, and feed errors into AI for instant solutions.
+      </p>
+    </div>
+
+    <!-- Flagship Detailed DevTools Simulator -->
+    <div class="section-block">
+      <h2>🔍 The Chrome DevTools Detective Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click an error scenario to inspect the exact Console or Network output, then watch the AI Diagnosis engine trace and repair it:
+      </p>
+
+      <div class="sim-container">
+        
+        <!-- Bug Buttons -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+          <button class="btn btn-primary" onclick="loadBug('map')">1. Blank Screen (`undefined.map`)</button>
+          <button class="btn btn-secondary" onclick="loadBug('cors')">2. CORS Policy Blocked</button>
+          <button class="btn btn-secondary" onclick="loadBug('jwt')">3. 401 Unauthorized (JWT Missing)</button>
+          <button class="btn btn-secondary" onclick="loadBug('mongo')">4. 500 DB Connection Timeout</button>
+        </div>
+
+        <!-- DevTools + AI Diagnosis Split Grid -->
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.25rem;">
+          
+          <!-- Screen 1: Chrome DevTools Window -->
+          <div class="devtools-window">
+            <div class="devtools-tabs">
+              <span class="dt-tab">Elements</span>
+              <span id="tabConsole" class="dt-tab active">Console (1)</span>
+              <span id="tabNetwork" class="dt-tab">Network</span>
+              <span class="dt-tab">Sources</span>
+              <span class="dt-tab">Application</span>
+            </div>
+
+            <div style="background: #030712; padding: 1rem; flex: 1; min-height: 230px; overflow-y: auto;">
+              <div id="devtoolsOutput">
+                <!-- Dynamic Error Snippet -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen 2: AI Detective Resolution -->
+          <div class="devtools-window">
+            <div style="background: #0f1523; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: #a5b4fc; font-weight: 700;">🤖 AI DIAGNOSIS ENGINE</span>
+              <span style="font-size: 0.7rem; color: var(--accent-emerald);">● Resolution Ready</span>
+            </div>
+
+            <div id="aiResolutionView" style="background: #050813; padding: 1rem; flex: 1; min-height: 230px; font-size: 0.8rem; color: #cbd5e1; overflow-y: auto; line-height: 1.6;">
+              <!-- Dynamic Solution -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The 4-Layer Detective Framework</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart TD
+    Bug[Bug Detected!] --> L1{Layer 1: IDE Squiggles}
+    L1 -->|Syntax Error| F1[Fix spelling, missing quotes or bad imports]
+    L1 -->|Clean| L2{Layer 2: Browser Console}
+    L2 -->|Red Error in Console| F2[React runtime crash: check undefined objects or state]
+    L2 -->|Clean| L3{Layer 3: Network Tab}
+    L3 -->|404 or 401 or 500| F3[Check URL spelling, auth Bearer header, or CORS]
+    L3 -->|500 Server Error| L4[Layer 4: Terminal Window -> Check Node/Mongoose stack trace]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's Diagnostic Cockpit</h2>
+      <div class="file-tree">
+        diagnostic-surfaces/<br>
+        ├── <span class="highlight">Browser DevTools: Console</span> <span class="desc">← React errors, component warnings, unhandled promises</span><br>
+        ├── <span class="highlight">Browser DevTools: Network</span> <span class="desc">← HTTP method, request payload, response status code</span><br>
+        └── <span class="highlight">Terminal Console</span> <span class="desc">← Express server crash dumps, MongoDB query validation errors</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: The Bulletproof Error-Feeding Prompt</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt17')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt17">I encountered an error in my MERN stack application.
+
+1. The exact error message from the [Terminal / Browser Console / Network Tab]:
+```
+TypeError: Cannot read properties of undefined (reading 'map')
+  at FeedPage (FeedPage.jsx:24)
+```
+
+2. What I was trying to do:
+I opened the FeedPage to display the list of posts fetched from `http://localhost:5000/api/posts`.
+
+3. Here is the relevant code from `client/src/pages/FeedPage.jsx`:
+```jsx
+const [posts, setPosts] = useState();
+
+useEffect(() => {
+  axios.get('/api/posts').then(res => setPosts(res.data));
+}, []);
+
+return (
+  <div>{posts.map(p => <Card key={p._id} post={p} />)}</div>
+);
+```
+
+Please:
+1. Explain why this happened in simple plain English.
+2. Show the exact lines to fix in `FeedPage.jsx`.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Stack Trace</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A detailed error report printed by Node or the browser showing the exact chain of functions called and the exact file and line number where code failed.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Syntax Error</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A spelling or grammatical mistake in your code (like a missing bracket or unclosed quote) that stops the program from even starting.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Runtime Error</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A crash that happens while the program is actively running (such as trying to read properties from an `undefined` variable).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Console Tab</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The browser DevTools panel that logs messages, warnings, and unhandled JavaScript runtime exceptions.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Network Tab</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The browser DevTools panel that records every HTTP request, showing status codes (200, 404, 500), payloads, headers, and latency.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`TypeError: Cannot read properties of undefined`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The most common JavaScript crash: attempting to access a property or call a method (like `.map()`) on a variable that has not yet received its data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Errors are Roadmaps:</strong> Read the file name and line number in red text. The error tells you exactly where the problem originated.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Default Your State:</strong> Always initialize array state as `useState([])` to prevent `undefined.map` crashes while waiting for data.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Feed AI the Truth:</strong> Never summarize an error into "it didn't work". Always paste the raw text of the error alongside the source file.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function loadBug(type) {
+      const dt = document.getElementById('devtoolsOutput');
+      const ai = document.getElementById('aiResolutionView');
+      const tCon = document.getElementById('tabConsole');
+      const tNet = document.getElementById('tabNetwork');
+
+      if (type === 'map') {
+        tCon.classList.add('active');
+        tNet.classList.remove('active');
+        dt.innerHTML = `
+          <div class="error-entry">
+            <strong>Uncaught TypeError: Cannot read properties of undefined (reading 'map')</strong><br>
+            &nbsp;&nbsp;at FeedPage (<span style="color: #38bdf8; text-decoration: underline;">FeedPage.jsx:24:18</span>)<br>
+            &nbsp;&nbsp;at renderWithHooks (react-dom.development.js:15405)
+          </div>
+        `;
+        ai.innerHTML = `
+          <strong style="color: #38bdf8;">1. Plain English Root Cause:</strong><br>
+          Your component tried to execute <code>posts.map()</code> on the first render, but the async API fetch had not finished yet. <code>posts</code> was <code>undefined</code>.<br><br>
+          <strong style="color: #10b981;">2. The 1-Line Fix:</strong><br>
+          Initialize your array state with an empty array in <code>FeedPage.jsx:8</code>:<br>
+          <code style="color: #a5b4fc; background: #030712; padding: 2px 6px; border-radius: 4px;">const [posts, setPosts] = useState([]);</code>
+        `;
+      } else if (type === 'cors') {
+        tCon.classList.add('active');
+        tNet.classList.remove('active');
+        dt.innerHTML = `
+          <div class="error-entry">
+            <strong>Access to XMLHttpRequest at 'http://localhost:5000/api/items' from origin 'http://localhost:5173' has been blocked by CORS policy:</strong><br>
+            No 'Access-Control-Allow-Origin' header is present on the requested resource.
+          </div>
+        `;
+        ai.innerHTML = `
+          <strong style="color: #38bdf8;">1. Plain English Root Cause:</strong><br>
+          Your browser is blocking port 5173 (React) from accessing port 5000 (Express) because the Express server did not grant permission.<br><br>
+          <strong style="color: #10b981;">2. The 2-Line Fix:</strong><br>
+          In <code>server/server.js</code>, install and enable the cors middleware:<br>
+          <code style="color: #a5b4fc; background: #030712; padding: 2px 6px; border-radius: 4px;">const cors = require('cors');<br>app.use(cors());</code>
+        `;
+      } else if (type === 'jwt') {
+        tCon.classList.remove('active');
+        tNet.classList.add('active');
+        dt.innerHTML = `
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #cbd5e1;">
+            <div style="color: #f43f5e; font-weight: 700; margin-bottom: 0.4rem;">STATUS: 401 Unauthorized (2ms)</div>
+            Request URL: http://localhost:5000/api/user/profile<br>
+            Request Headers: { "Content-Type": "application/json" } <span style="color: #f43f5e;">[Missing Authorization Header]</span><br><br>
+            Response Payload: { "message": "Not authorized, no token provided" }
+          </div>
+        `;
+        ai.innerHTML = `
+          <strong style="color: #38bdf8;">1. Plain English Root Cause:</strong><br>
+          The protected route expected a Bearer token in the <code>Authorization</code> header, but Axios sent the request without headers.<br><br>
+          <strong style="color: #10b981;">2. The Fix:</strong><br>
+          Attach the token from localStorage inside your Axios call or interceptor:<br>
+          <code style="color: #a5b4fc; background: #030712; padding: 2px 6px; border-radius: 4px;">headers: { Authorization: \`Bearer \${token}\` }</code>
+        `;
+      } else if (type === 'mongo') {
+        tCon.classList.remove('active');
+        tNet.classList.add('active');
+        dt.innerHTML = `
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #f43f5e;">
+            <div style="font-weight: 700; margin-bottom: 0.4rem;">STATUS: 500 Internal Server Error</div>
+            MongooseError: Operation \`tasks.insertOne()\` buffering timed out after 10000ms<br>
+            &nbsp;&nbsp;at taskController.js:18:22
+          </div>
+        `;
+        ai.innerHTML = `
+          <strong style="color: #38bdf8;">1. Plain English Root Cause:</strong><br>
+          Your Express server cannot reach your MongoDB Atlas database. Either the IP whitelist is blocking your machine, or your database password in <code>.env</code> is incorrect.<br><br>
+          <strong style="color: #10b981;">2. The Fix:</strong><br>
+          1. Go to <a href="https://cloud.mongodb.com" target="_blank" style="color: var(--accent-cyan);">cloud.mongodb.com</a> ➔ Network Access ➔ Add IP: <code>0.0.0.0/0</code>.<br>
+          2. Verify your <code>MONGO_URI</code> in <code>server/.env</code> has no special character syntax errors.
+        `;
+      }
+    }
+
+    loadBug('map');
+  </script>
+</body>
+</html>

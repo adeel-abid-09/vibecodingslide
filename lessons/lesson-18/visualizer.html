@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 18 | Going Live & Demo Day</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">18</div>
+      <span>Lesson 18: Going Live</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-17/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 17</a>
+      <a href="../../index.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">🎓 Course Portal</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-deploy">Module 5 &bull; Class 18 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Going Live to the World & Demo Day!</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Deploy your database to MongoDB Atlas, your backend API to Render, and your React frontend to Vercel.
+      </p>
+    </div>
+
+    <!-- Interactive Deployment Simulator -->
+    <div class="section-block">
+      <h2>🚀 Interactive Production Deployment Pipeline</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click the stages below to simulate deploying a full-stack MERN application to public cloud servers:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <button id="depBtn1" class="btn btn-primary" onclick="runDeployStage(1)">1. git push origin main</button>
+          <button id="depBtn2" class="btn btn-secondary" onclick="runDeployStage(2)" disabled>2. Deploy Backend (Render)</button>
+          <button id="depBtn3" class="btn btn-secondary" onclick="runDeployStage(3)" disabled>3. Deploy Frontend (Vercel)</button>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.4rem;">CLOUD BUILD PIPELINE STATUS:</div>
+          <div id="deployTerminal" style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.82rem; color: #94a3b8; min-height: 140px; line-height: 1.6;">
+            [Ready] Push your repository to trigger the automated CI/CD cloud build...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The Production Cloud Topology</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart TD
+    subgraph Internet ["Public Internet"]
+        Users["Worldwide Users"]
+    end
+
+    subgraph FrontendPlatform ["Frontend Hosting: Vercel CDN"]
+        VercelApp["https://my-capstone.vercel.app"]
+        VercelEnv["Env: VITE_API_URL"]
+    end
+
+    subgraph BackendPlatform ["Backend Hosting: Render Web Service"]
+        RenderAPI["https://api-capstone.onrender.com"]
+        RenderEnv["Env: MONGO_URI, JWT_SECRET, PORT"]
+    end
+
+    subgraph DatabaseCloud ["Database: MongoDB Atlas"]
+        Cluster["AWS MongoDB Cluster\nWhitelist: 0.0.0.0/0"]
+    end
+
+    Users -->|HTTPS| VercelApp
+    VercelApp -->|REST Calls| RenderAPI
+    RenderAPI <-->|Mongoose Queries| Cluster
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's Deployment Configuration</h2>
+      <div class="file-tree">
+        my-capstone/<br>
+        ├── client/<br>
+        │   ├── <span class="highlight">vercel.json</span> <span class="desc">← Rewrites routes to /index.html for React Router</span><br>
+        │   └── <span class="highlight">.env.production</span> <span class="desc">← VITE_API_URL=https://api-capstone.onrender.com</span><br>
+        └── server/<br>
+            └── <span class="highlight">package.json</span> <span class="desc">← Must declare "start": "node server.js"</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Production Deployment Configuration</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt18')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt18">I am ready to deploy my MERN stack application.
+- Frontend: Vite + React on Vercel
+- Backend: Express + Node.js on Render
+- Database: MongoDB Atlas
+
+Please provide:
+1. The exact `vercel.json` file needed in `client/` to prevent 404 errors when users refresh deep React Router routes.
+2. In `server/package.json`: The exact `start` script and Node engine configuration required by Render.
+3. A step-by-step checklist of what environment variables must be added to Render vs Vercel.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Localhost</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A hostname that means "this local computer only". Servers running on localhost are invisible to anyone outside your private machine.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Production Build (`npm run build`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The process of compiling, optimizing, and minifying your source code into ultra-fast, compact static files ready for deployment.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CDN (Content Delivery Network)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A worldwide network of distributed servers (like Vercel or Cloudflare) that caches and serves your frontend files from the server closest to the visitor.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Cloud Web Service (Render/Railway)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A platform that hosts your live backend Node.js server 24/7 on cloud virtual machines connected to the public internet.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">SPA Rewrite Rule (`vercel.json`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A server configuration that redirects all incoming URL requests back to `index.html` so React Router can handle page navigation without 404 errors.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CI/CD (Continuous Integration / Continuous Deployment)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An automated pipeline where pushing new code to GitHub automatically triggers a build and updates your live deployed website within minutes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>`localhost` vs The Cloud:</strong> Localhost only lives on your private computer. Deployment moves your code to public cloud servers reachable anywhere on Earth.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Vercel SPA Rewrites:</strong> Always configure `vercel.json` rewrites so that page refreshes on subroutes like `/dashboard` don't return 404.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>You Are a Full-Stack System Architect:</strong> In 18 classes, you learned how to design data models, direct AI to write clean modular code, debug like a detective, and launch real products.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function runDeployStage(stage) {
+      const term = document.getElementById('deployTerminal');
+      const b2 = document.getElementById('depBtn2');
+      const b3 = document.getElementById('depBtn3');
+
+      if (stage === 1) {
+        term.innerHTML = `
+$ git push origin main<br>
+Enumerating objects: 48, done.<br>
+Writing objects: 100% (48/48), 125.40 KiB | 4.18 MiB/s, done.<br>
+<span style="color: #10b981;">To github.com/username/my-capstone.git [new branch] main -> main</span><br>
+<span style="color: var(--accent-cyan);">GitHub Webhooks triggered for Render & Vercel! Click Step 2.</span>
+        `;
+        b2.disabled = false;
+      } else if (stage === 2) {
+        term.innerHTML += `<br>
+<span style="color: #f59e0b;">==> [RENDER] Building Web Service (Node.js)...</span><br>
+==> Running 'npm install'<br>
+==> Injected environment variables: MONGO_URI, JWT_SECRET, PORT<br>
+==> Starting service with 'npm start'<br>
+==> Server listening on port 10000<br>
+==> MongoDB Atlas Connected successfully!<br>
+<span style="color: #10b981;">==> [SUCCESS] Backend Live at: https://my-capstone-api.onrender.com</span>
+        `;
+        b3.disabled = false;
+      } else if (stage === 3) {
+        term.innerHTML += `<br>
+<span style="color: #8b5cf6;">==> [VERCEL] Building Frontend (Vite + React)...</span><br>
+==> Running 'npm run build'<br>
+==> Generated dist/ optimized bundle (142 kB)<br>
+==> Routing configured with vercel.json rewrite rules<br>
+<span style="color: #10b981; font-weight: 700; font-size: 0.95rem;">🎉 YOUR APP IS LIVE TO THE WORLD: https://my-capstone.vercel.app</span>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

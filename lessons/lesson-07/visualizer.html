@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 07 | Complete Database CRUD</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">07</div>
+      <span>Lesson 07: Database CRUD</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-06/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 06</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-08/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 08 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-backend">Module 2 &bull; Class 07 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Complete Database CRUD (MVC Architecture)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the professional separation of Routes and Controllers, perform CRUD operations, and catch database errors gracefully.
+      </p>
+    </div>
+
+    <!-- Interactive CRUD Simulator -->
+    <div class="section-block">
+      <h2>⚡ Interactive CRUD Studio</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Add, toggle, or delete documents below to see the exact Mongoose method and HTTP status code:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <input type="text" id="taskInput" placeholder="Enter new task title..." style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.6rem 1rem; border-radius: 6px; flex-grow: 1; max-width: 320px;">
+          <button class="btn btn-primary" onclick="createTask()">Create Task (POST)</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+          
+          <!-- Live Mongo Table -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.5rem;">LIVE MONGODB COLLECTION (`tasks`):</div>
+            <div id="taskList" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <!-- Dynamic Task Items -->
+            </div>
+          </div>
+
+          <!-- Mongoose Command Log -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.5rem;">CONTROLLER & MONGOOSE LOG:</div>
+            <div id="mongooseLog" style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; color: #a5b4fc; min-height: 150px; line-height: 1.6;">
+              // Mongoose operations will log here...
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid MVC Diagram -->
+    <div class="section-block">
+      <h2>📐 The MVC Execution Flow</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    Client->>Route: POST /api/tasks
+    Route->>Controller: Invokes createTask(req, res)
+    Controller->>Model: Task.create({ title: req.body.title })
+    Model->>DB: Inserts document into MongoDB
+    DB-->>Model: Returns new document with _id
+    Model-->>Controller: Resolves promise
+    Controller-->>Client: Returns HTTP 201 + JSON
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        backend/<br>
+        ├── models/<br>
+        │   └── <span class="highlight">Task.js</span> <span class="desc">← Mongoose Schema</span><br>
+        ├── controllers/<br>
+        │   └── <span class="highlight">taskController.js</span> <span class="desc">← Database queries (find, create, findByIdAndUpdate)</span><br>
+        ├── routes/<br>
+        │   └── <span class="highlight">taskRoutes.js</span> <span class="desc">← Route declarations (router.get, router.post)</span><br>
+        └── <span>server.js</span> <span class="desc">← Mounts app.use('/api/tasks', taskRoutes)</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: MVC CRUD Controller & Routes</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt7')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt7">I have a Mongoose model at `server/models/Note.js` with fields: `title`, `body`, and `isPinned`.
+
+Please create two separate clean files following professional MVC pattern:
+1. `server/controllers/noteController.js`:
+   - `getNotes`: Fetch all notes sorted by newest first.
+   - `createNote`: Validate title exists, then `Note.create(req.body)`. Return 201.
+   - `updateNote`: Use `findByIdAndUpdate(req.params.id, req.body, { new: true })`.
+   - `deleteNote`: Use `findByIdAndDelete(req.params.id)`.
+   - Use async/await and try/catch in all functions. Return status 400 for bad input and 500 for server errors.
+
+2. `server/routes/noteRoutes.js`:
+   - Mount these controllers to RESTful paths (`/` and `/:id`).</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CRUD</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The 4 fundamental operations of any database system: Create (POST), Read (GET), Update (PUT), and Delete (DELETE).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">MVC (Model-View-Controller)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A professional software architecture pattern that separates an app into 3 distinct layers: Model (data rules), View (the UI), and Controller (business logic).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Controller</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A dedicated JavaScript file containing the actual worker functions that extract user input, query MongoDB with Mongoose, and return JSON responses.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Router</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An Express module (`express.Router()`) that maps clean URL paths to their respective controller functions.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`try / catch`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A JavaScript safety net: code in `try` executes normally, and if any unexpected database error occurs, `catch` intercepts it so your server doesn't crash.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`findByIdAndUpdate`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A Mongoose query method that searches for a document by its unique `_id` and applies modifications, returning the updated document when `{ new: true }` is passed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>MVC Separation:</strong> Routes handle the HTTP paths; Controllers handle the database work; Models guard the data shape.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The Essential 4:</strong> `find()`, `create()`, `findByIdAndUpdate()`, and `findByIdAndDelete()` power 90% of web apps.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Always use `try/catch`:</strong> If your database goes down or queries fail, `try/catch` catches the error and sends a clean 500 status rather than crashing your entire server.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let tasks = [
+      { id: '660fa110', title: 'Learn MVC Architecture', done: true },
+      { id: '660fa125', title: 'Connect to MongoDB Atlas', done: false }
+    ];
+
+    function renderTasks() {
+      const container = document.getElementById('taskList');
+      container.innerHTML = '';
+      tasks.forEach(t => {
+        const div = document.createElement('div');
+        div.style.background = '#060911';
+        div.style.border = '1px solid var(--border-color)';
+        div.style.padding = '0.6rem 0.8rem';
+        div.style.borderRadius = '6px';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+
+        div.innerHTML = `
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-faint); margin-right: 0.5rem;">[${t.id}]</span>
+            <span style="font-size: 0.85rem; color: ${t.done ? 'var(--text-muted)' : '#fff'}; text-decoration: ${t.done ? 'line-through' : 'none'};">${t.title}</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button onclick="toggleTask('${t.id}')" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #10b981; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">${t.done ? 'Undo' : 'Done'}</button>
+            <button onclick="deleteTask('${t.id}')" style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); color: #f43f5e; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">Del</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function createTask() {
+      const input = document.getElementById('taskInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const newId = '660fa' + Math.floor(Math.random() * 900 + 100);
+      tasks.push({ id: newId, title: val, done: false });
+      input.value = '';
+      renderTasks();
+
+      document.getElementById('mongooseLog').innerHTML = `
+<span style="color: #10b981;">[POST /api/tasks] -> 201 Created</span><br>
+await Task.create({ title: "${val}", completed: false });<br>
+=> Inserted document ID: ${newId}
+      `;
+    }
+
+    function toggleTask(id) {
+      const t = tasks.find(x => x.id === id);
+      if (t) {
+        t.done = !t.done;
+        renderTasks();
+        document.getElementById('mongooseLog').innerHTML = `
+<span style="color: #38bdf8;">[PUT /api/tasks/${id}] -> 200 OK</span><br>
+await Task.findByIdAndUpdate('${id}', { completed: ${t.done} }, { new: true });
+        `;
+      }
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(x => x.id !== id);
+      renderTasks();
+      document.getElementById('mongooseLog').innerHTML = `
+<span style="color: #f43f5e;">[DELETE /api/tasks/${id}] -> 200 OK</span><br>
+await Task.findByIdAndDelete('${id}');<br>
+=> Document removed from collection.
+      `;
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>

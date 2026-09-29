@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 12 | Multi-Page Navigation (React Router)</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">12</div>
+      <span>Lesson 12: React Router</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-11/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 11</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-13/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 13 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-frontend">Module 3 &bull; Class 12 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Multi-Page Navigation (React Router DOM)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Build seamless multi-page web applications with instant client-side routing, shared layouts, and dynamic URL parameters.
+      </p>
+    </div>
+
+    <!-- Interactive Router Simulator -->
+    <div class="section-block">
+      <h2>🌐 Interactive SPA Router Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click the navigation links below to see how React Router swaps components without ever reloading the browser:
+      </p>
+
+      <div class="sim-container">
+        <!-- Mock Browser Frame -->
+        <div style="background: #030712; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden;">
+          <div style="background: #0b0f19; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.8rem; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; gap: 5px;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #f43f5e;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+            </div>
+            <div style="background: #030712; padding: 0.25rem 0.8rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; color: #38bdf8; flex-grow: 1;">
+              https://my-mern-app.com<span id="browserUrl" style="color: #fff; font-weight: 700;">/</span>
+            </div>
+          </div>
+
+          <!-- Inside Browser UI -->
+          <div style="padding: 1.5rem;">
+            <!-- Shared Navbar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+              <div style="font-weight: 800; color: #fff;">🛍️ ShopSphere</div>
+              <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="navigate('/', 'Home')">Home</button>
+                <button class="btn btn-secondary" onclick="navigate('/products', 'Products')">Products</button>
+                <button class="btn btn-secondary" onclick="navigate('/products/42', 'Detail')">Product #42</button>
+              </div>
+            </div>
+
+            <!-- Page Content Swap -->
+            <div id="pageContent" style="min-height: 120px;">
+              <h3 style="color: #fff; margin-bottom: 0.5rem;">Welcome to the Home Page!</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Notice that clicking links does not cause any screen flicker or reload. React simply mounted `HomePage.jsx`.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The Route Matching Tree</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart TD
+    URL[Browser URL changes to /products/42] --> Router{Routes Matcher}
+    Router -->|Match: /| P1[HomePage]
+    Router -->|Match: /products| P2[ProductListPage]
+    Router -->|Match: /products/:id| P3["ProductDetailPage (id = 42)"]
+    Router -->|No Match *| P4[NotFound404]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        client/src/<br>
+        ├── <span class="highlight">App.jsx</span> <span class="desc">← Sets up BrowserRouter, Routes, and Route paths</span><br>
+        ├── components/<br>
+        │   └── <span class="highlight">Navbar.jsx</span> <span class="desc">← Uses Link to="..." for zero-reload navigation</span><br>
+        └── pages/<br>
+            ├── HomePage.jsx <span class="desc">← Default route /</span><br>
+            ├── ProductsPage.jsx <span class="desc">← Route /products</span><br>
+            └── <span class="highlight">ProductDetail.jsx</span> <span class="desc">← Route /products/:id (uses useParams)</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: React Router Setup with Dynamic Routes</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt12')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt12">I am building a React application using `react-router-dom` (v6) with Vite.
+Please configure the routing setup inside `client/src/App.jsx`.
+
+Requirements:
+- Pages to route:
+  1. `/` -> `HomePage`
+  2. `/products` -> `ProductListPage`
+  3. `/products/:id` -> `ProductDetailPage` (show how `useParams` reads the ID)
+  4. `*` -> `NotFoundPage` (404)
+- Maintain a shared persistent `<Navbar />` at the top of all pages.
+- Use `<Link to="...">` inside the Navbar for fast transitions without page reload.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Client-Side Routing</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Navigating between different page views within a Single Page Application using JavaScript, changing the URL without asking the server for a new HTML file.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">React Router DOM</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The standard routing library for React applications that enables client-side URL routing and multi-page layouts.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`BrowserRouter`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The top-level parent component that connects React Router to the browser's native address bar and history API.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`Routes` & `Route`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Components used to map URL paths to visual page components (e.g. `<Route path="/products" element={<ProductsPage />} />`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`<Link to="...">`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The React Router component used instead of `<a href>` to navigate smoothly between pages without reloading the browser window.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Dynamic Route (`:id`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A URL segment prefixed with a colon that acts as a wildcard parameter matching any dynamic value (e.g. `/product/842`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`useParams`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A React Router hook that extracts the dynamic parameters from the current URL path into a clean JavaScript object.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>`<Link>` Replaces `<a>`:</strong> Always use `<Link to="...">` in React to preserve state and prevent destructive page reloads.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Dynamic URL Segments:</strong> Using `:id` creates a wildcard that matches any dynamic value (`/products/123`, `/products/abc`).
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>`useParams` Hook:</strong> Extract URL params in one clean line: `const { id } = useParams()`.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function navigate(path, page) {
+      document.getElementById('browserUrl').innerText = path;
+      const content = document.getElementById('pageContent');
+
+      if (page === 'Home') {
+        content.innerHTML = `
+          <h3 style="color: #fff; margin-bottom: 0.5rem;">Welcome to the Home Page!</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Component Mounted: <code>&lt;HomePage /&gt;</code></p>
+        `;
+      } else if (page === 'Products') {
+        content.innerHTML = `
+          <h3 style="color: #fff; margin-bottom: 0.5rem;">Product Catalog</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Component Mounted: <code>&lt;ProductsPage /&gt;</code> (Viewing 24 items)</p>
+        `;
+      } else if (page === 'Detail') {
+        content.innerHTML = `
+          <h3 style="color: #fff; margin-bottom: 0.5rem;">Product Details: ID #42</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Component Mounted: <code>&lt;ProductDetail /&gt;</code><br>Extracted via hook: <code>const { id } = useParams() // id = "42"</code></p>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

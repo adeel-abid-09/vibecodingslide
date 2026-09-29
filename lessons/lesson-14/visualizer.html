@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 14 | The Full-Stack Handshake & CORS</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">14</div>
+      <span>Lesson 14: Full-Stack CORS</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-13/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 13</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-15/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 15 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-fullstack">Module 4 &bull; Class 14 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">The Full-Stack Handshake (React to Express)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Bridge the gap between Port 5173 and Port 5000, master CORS security headers, and centralize API services.
+      </p>
+    </div>
+
+    <!-- Interactive CORS Simulator -->
+    <div class="section-block">
+      <h2>🤝 Interactive CORS Handshake Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Toggle Express CORS middleware on or off, then send an HTTP request from React to observe how the browser security shield reacts:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; background: #0b0f19; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color);">
+            <input type="checkbox" id="corsToggle" checked onchange="toggleCors()"> Enable `app.use(cors())` on Backend (Port 5000)
+          </label>
+          <button class="btn btn-primary" onclick="testHandshake()">Send Request from React (Port 5173)</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+          
+          <!-- Browser Console View -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.4rem;">BROWSER CONSOLE LOG:</div>
+            <div id="browserConsole" style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; color: #cbd5e1; min-height: 130px; line-height: 1.5;">
+              // Click "Send Request" to test cross-origin communication
+            </div>
+          </div>
+
+          <!-- Network Inspector View -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.4rem;">NETWORK TAB INSPECTOR:</div>
+            <div id="networkInspect" style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; color: #a5b4fc; min-height: 130px; line-height: 1.5;">
+              // Headers will be inspected here...
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The Cross-Origin Preflight Handshake</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant React as React (http://localhost:5173)
+    participant Guard as Browser Security Layer
+    participant Express as Express (http://localhost:5000)
+
+    React->>Guard: Requests POST /api/tasks
+    Note over Guard: Origin 5173 != Target 5000!
+    Guard->>Express: OPTIONS /api/tasks (Preflight Check)
+    alt CORS Middleware Enabled
+        Express-->>Guard: Access-Control-Allow-Origin: *
+        Guard->>Express: Transmits actual POST request
+        Express-->>React: HTTP 201 Created + JSON Data
+    else CORS Middleware Missing
+        Express-->>Guard: No Access-Control headers returned
+        Guard-->>React: 🚨 BLOCKED by CORS policy! (Red Console Error)
+    end
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        my-fullstack-app/<br>
+        ├── client/<br>
+        │   ├── <span class="highlight">.env</span> <span class="desc">← VITE_API_URL=http://localhost:5000/api</span><br>
+        │   └── src/services/<br>
+        │       └── <span class="highlight">api.js</span> <span class="desc">← Centralized Axios client with automatic Bearer tokens</span><br>
+        └── server/<br>
+            └── <span class="highlight">server.js</span> <span class="desc">← const cors = require('cors'); app.use(cors())</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Full-Stack CORS & Axios Setup</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt14')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt14">I have a MERN monorepo with `client/` (Vite) and `server/` (Express).
+
+Please provide:
+1. In `server/server.js`: Configure the `cors` package to allow requests from `http://localhost:5173` and allow credentials and Authorization headers.
+2. In `client/src/services/api.js`: Create an Axios instance that:
+   - Uses `import.meta.env.VITE_API_URL` as baseURL.
+   - Automatically attaches the Bearer token from `localStorage.getItem('token')` to every outgoing request using an Axios interceptor.
+3. Show a complete React component example that submits a new task and displays the updated list in real time.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Origin</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The combination of Protocol (`http`), Domain/Host (`localhost`), and Port (`5173`). Two URLs are only same-origin if all three match exactly.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CORS (Cross-Origin Resource Sharing)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A browser security mechanism that restricts web pages from making API requests to a domain or port different from the one that served the page.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Same-Origin Policy (SOP)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A critical browser security rule that stops malicious scripts on one website from secretly making requests to another website where you are logged in.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Preflight Request (OPTIONS)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An automatic preliminary check sent by the browser to the backend asking: "Does your server permit requests from my origin, with my headers?"</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`Access-Control-Allow-Origin`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The HTTP header sent by the Express server telling the browser which client origins are permitted to access its data (e.g. `*` or `http://localhost:5173`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Axios Interceptor</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A global middleware hook in Axios that automatically injects headers (like `Authorization: Bearer <token>`) into every outgoing request before it leaves the browser.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Monorepo</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A software repository structure where both the frontend (`client/`) and backend (`server/`) codebases live together in one organized project folder.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>CORS is Browser-Enforced:</strong> Postman never has CORS issues; only browsers enforce CORS to protect users from malicious scripts on other domains.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The 2-Line Backend Fix:</strong> `const cors = require('cors'); app.use(cors());` tells all browsers that your API is open for business.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Environment Portability:</strong> Never hardcode `http://localhost:5000` inside React components. Always use `VITE_API_URL`.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let corsEnabled = true;
+
+    function toggleCors() {
+      corsEnabled = document.getElementById('corsToggle').checked;
+    }
+
+    function testHandshake() {
+      const consoleLog = document.getElementById('browserConsole');
+      const net = document.getElementById('networkInspect');
+
+      if (corsEnabled) {
+        consoleLog.innerHTML = `
+<span style="color: #10b981;">[SUCCESS] Request completed!</span><br>
+HTTP 201 Created from http://localhost:5000/api/tasks<br>
+Data received: { id: "660fa48", title: "New Task" }
+        `;
+        net.innerHTML = `
+Status: <span style="color: #10b981;">201 Created</span><br>
+Request URL: http://localhost:5000/api/tasks<br>
+Response Headers:<br>
+&bull; Access-Control-Allow-Origin: *<br>
+&bull; Content-Type: application/json
+        `;
+      } else {
+        consoleLog.innerHTML = `
+<span style="color: #f43f5e;">Access to XMLHttpRequest at 'http://localhost:5000/api/tasks' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.</span>
+        `;
+        net.innerHTML = `
+Status: <span style="color: #f43f5e;">(failed) net::ERR_FAILED</span><br>
+Request URL: http://localhost:5000/api/tasks<br>
+Response Headers: <span style="color: #f43f5e;">[Missing CORS Headers]</span>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

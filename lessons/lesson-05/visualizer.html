@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 05 | REST APIs & HTTP Verbs</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    /* Full Postman / Thunder Client Interface */
+    .api-client {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .client-topbar {
+      background: #0f1523;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .verb-select {
+      background: #1e293b;
+      color: #fff;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .verb-select.get { color: #10b981; }
+    .verb-select.post { color: #f59e0b; }
+    .verb-select.put { color: #38bdf8; }
+    .verb-select.delete { color: #f43f5e; }
+
+    .url-input {
+      flex: 1;
+      background: #040711;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.45rem 0.9rem;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .sub-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #070b14;
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sub-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .sub-tab-btn.active {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">05</div>
+      <span>Lesson 05: REST APIs</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-04/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 04</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-06/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 06 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-backend">Module 2 &bull; Class 05 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">REST APIs & The HTTP Language</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the 4 fundamental HTTP verbs, headers, route parameters, and status codes.
+      </p>
+    </div>
+
+    <!-- Flagship Detailed API Console (Thunder Client / Postman UI) -->
+    <div class="section-block">
+      <h2>📡 Thunder Client REST Studio</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Select from the test scenarios or manually construct HTTP requests to see headers, payloads, and response status codes:
+      </p>
+
+      <!-- Preset Scenarios Bar -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <button class="btn btn-secondary" onclick="loadPreset('get')" style="font-size: 0.75rem; padding: 0.3rem 0.7rem;">🟢 GET /api/tasks</button>
+        <button class="btn btn-secondary" onclick="loadPreset('post_valid')" style="font-size: 0.75rem; padding: 0.3rem 0.7rem;">🟠 POST /api/tasks (Valid)</button>
+        <button class="btn btn-secondary" onclick="loadPreset('post_invalid')" style="font-size: 0.75rem; padding: 0.3rem 0.7rem;">⚠️ POST /api/tasks (Empty Title ➔ 400)</button>
+        <button class="btn btn-secondary" onclick="loadPreset('delete')" style="font-size: 0.75rem; padding: 0.3rem 0.7rem;">🔴 DELETE /api/tasks/1</button>
+      </div>
+
+      <div class="api-client">
+        
+        <!-- Top Request Bar -->
+        <div class="client-topbar">
+          <select id="methodPill" class="verb-select get" onchange="updateMethodColor()">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+          <input type="text" id="urlInput" class="url-input" value="http://localhost:5000/api/tasks">
+          <button class="btn btn-primary" onclick="sendApiRequest()" style="padding: 0.45rem 1.2rem;">
+            ⚡ Send
+          </button>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active">Body (JSON)</button>
+          <button class="sub-tab-btn">Headers (2)</button>
+          <button class="sub-tab-btn">Params</button>
+        </div>
+
+        <!-- Split Grid: Request vs Response -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border-color);">
+          
+          <!-- Left: Request Body Editor -->
+          <div style="padding: 1rem; background: #030712; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
+            <div style="font-size: 0.72rem; color: var(--text-faint); margin-bottom: 0.4rem; font-family: var(--font-mono);">
+              REQUEST BODY (application/json):
+            </div>
+            <textarea id="reqJsonArea" style="background: #060911; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.8rem; color: #cbd5e1; flex: 1; min-height: 180px; resize: none; line-height: 1.5;">// GET requests do not have a body</textarea>
+          </div>
+
+          <!-- Right: Response Viewer -->
+          <div style="padding: 1rem; background: #050813; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.72rem; color: var(--text-faint); font-family: var(--font-mono);">RESPONSE DATA:</span>
+              <div style="display: flex; gap: 0.6rem; align-items: center;">
+                <span id="statusCodeBadge" style="font-size: 0.75rem; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">Status: -</span>
+                <span id="timeBadge" style="font-size: 0.72rem; color: var(--text-faint); font-family: var(--font-mono);">0 ms</span>
+              </div>
+            </div>
+
+            <div id="resJsonView" style="background: #020409; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.78rem; color: #38bdf8; flex: 1; min-height: 180px; overflow-y: auto; line-height: 1.6;">
+              // Click "Send" to inspect server response...
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 REST Endpoint Dispatcher</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart LR
+    Client[Client Request] --> Router{Express Router}
+    Router -->|GET /api/tasks| H1["Read Tasks (Status 200)"]
+    Router -->|POST /api/tasks| H2["Validate req.body -> Save (Status 201)"]
+    Router -->|PUT /api/tasks/:id| H3["Update by ID (Status 200)"]
+    Router -->|DELETE /api/tasks/:id| H4["Delete by ID (Status 200)"]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        backend/<br>
+        ├── routes/<br>
+        │   └── <span class="highlight">taskRoutes.js</span> <span class="desc">← Express router with router.get, router.post</span><br>
+        ├── <span class="highlight">server.js</span> <span class="desc">← Mounts router: app.use('/api/tasks', taskRoutes)</span><br>
+        └── <span>package.json</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Generate Express REST Routes</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt5')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt5">I am building an Express REST API. 
+Please create a route file at `server/routes/itemRoutes.js` using an in-memory JavaScript array for data.
+
+Requirements:
+- Endpoints:
+  1. GET /api/items - Return all items (200 OK)
+  2. POST /api/items - Validate that req.body.title exists; if missing return 400 Bad Request; otherwise add to array and return 201 Created.
+  3. DELETE /api/items/:id - Remove item by ID; return 404 if not found, or 200 with success message.
+- Show me how to mount this route file inside server/server.js.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">API (Application Programming Interface)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A defined digital contract of rules and endpoints that allows two separate software systems (like a React browser and an Express server) to talk to each other.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">REST (Representational State Transfer)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The industry-standard architectural style for building web APIs using standard URLs and HTTP methods.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Endpoint</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A specific URL path on a server that performs a specific action (e.g. `http://localhost:5000/api/products`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">HTTP Verbs (Methods)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The 4 primary action words of the web: GET (read), POST (create new), PUT (update existing), and DELETE (remove).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">HTTP Status Codes</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Standardized 3-digit numbers telling the client what happened: 2xx (Success), 3xx (Redirect), 4xx (Client mistake/missing data), 5xx (Server crashed).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Request Body (Payload)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The JSON data package sent inside a POST or PUT request from the client to the server.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">URL Parameter (`:id`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A dynamic placeholder in a route path (`/api/items/:id`) used to target a specific record, accessed via `req.params.id`.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Query String (`?search=term`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Key-value pairs appended to the end of a URL after a `?` used for sorting, filtering, or searching, accessed via `req.query`.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>HTTP Verbs Dictate Action:</strong> A URL like `/api/tasks` reads with `GET`, creates with `POST`, and removes with `DELETE`.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Status Codes Tell the Truth:</strong> `200/201` means success, `400` means bad client input, `404` means not found, `500` means server crashed.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>`req.params` vs `req.body`:</strong> `req.params.id` grabs values directly from the URL (`/api/items/99`); `req.body` carries complex JSON objects sent with POST/PUT.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    const pill = document.getElementById('methodPill');
+    const urlInput = document.getElementById('urlInput');
+    const reqBody = document.getElementById('reqJsonArea');
+    const resView = document.getElementById('resJsonView');
+    const statusBadge = document.getElementById('statusCodeBadge');
+    const timeBadge = document.getElementById('timeBadge');
+
+    function updateMethodColor() {
+      pill.className = 'verb-select ' + pill.value.toLowerCase();
+    }
+
+    function loadPreset(type) {
+      if (type === 'get') {
+        pill.value = 'GET';
+        urlInput.value = 'http://localhost:5000/api/tasks';
+        reqBody.value = '// GET requests do not require a request body';
+      } else if (type === 'post_valid') {
+        pill.value = 'POST';
+        urlInput.value = 'http://localhost:5000/api/tasks';
+        reqBody.value = `{\n  "title": "Complete MERN Lesson 05",\n  "priority": "high"\n}`;
+      } else if (type === 'post_invalid') {
+        pill.value = 'POST';
+        urlInput.value = 'http://localhost:5000/api/tasks';
+        reqBody.value = `{\n  "priority": "high"\n  // ERROR: Missing required 'title' field!\n}`;
+      } else if (type === 'delete') {
+        pill.value = 'DELETE';
+        urlInput.value = 'http://localhost:5000/api/tasks/1';
+        reqBody.value = '// DELETE targets the resource via URL parameter (:id)';
+      }
+      updateMethodColor();
+      sendApiRequest();
+    }
+
+    function sendApiRequest() {
+      const method = pill.value;
+      const url = urlInput.value;
+      const bodyText = reqBody.value;
+
+      statusBadge.innerHTML = `<span style="color: #f59e0b;">(Sending...)</span>`;
+      timeBadge.innerText = '...';
+
+      setTimeout(() => {
+        timeBadge.innerText = Math.floor(Math.random() * 15 + 8) + ' ms';
+
+        if (method === 'GET') {
+          statusBadge.innerHTML = `<span style="color: #10b981; font-weight: 700;">200 OK</span>`;
+          resView.innerHTML = `[\n  {\n    <span style="color: #f43f5e;">"id"</span>: 1,\n    <span style="color: #f43f5e;">"title"</span>: <span style="color: #10b981;">"Learn Node.js"</span>,\n    <span style="color: #f43f5e;">"completed"</span>: true\n  },\n  {\n    <span style="color: #f43f5e;">"id"</span>: 2,\n    <span style="color: #f43f5e;">"title"</span>: <span style="color: #10b981;">"Master REST APIs"</span>,\n    <span style="color: #f43f5e;">"completed"</span>: false\n  }\n]`;
+        } else if (method === 'POST') {
+          if (bodyText.includes('ERROR: Missing')) {
+            statusBadge.innerHTML = `<span style="color: #f59e0b; font-weight: 700;">400 Bad Request</span>`;
+            resView.innerHTML = `{\n  <span style="color: #f43f5e;">"error"</span>: <span style="color: #f59e0b;">"ValidationError"</span>,\n  <span style="color: #f43f5e;">"message"</span>: <span style="color: #cbd5e1;">"Field 'title' is required in request body."</span>\n}`;
+          } else {
+            statusBadge.innerHTML = `<span style="color: #10b981; font-weight: 700;">201 Created</span>`;
+            resView.innerHTML = `{\n  <span style="color: #f43f5e;">"message"</span>: <span style="color: #10b981;">"Task created successfully"</span>,\n  <span style="color: #f43f5e;">"data"</span>: {\n    <span style="color: #f43f5e;">"id"</span>: 3,\n    <span style="color: #f43f5e;">"title"</span>: <span style="color: #10b981;">"Complete MERN Lesson 05"</span>,\n    <span style="color: #f43f5e;">"priority"</span>: <span style="color: #10b981;">"high"</span>\n  }\n}`;
+          }
+        } else if (method === 'DELETE') {
+          statusBadge.innerHTML = `<span style="color: #10b981; font-weight: 700;">200 OK</span>`;
+          resView.innerHTML = `{\n  <span style="color: #f43f5e;">"success"</span>: true,\n  <span style="color: #f43f5e;">"message"</span>: <span style="color: #10b981;">"Task with ID 1 was permanently deleted."</span>\n}`;
+        }
+      }, 300);
+    }
+
+    updateMethodColor();
+  </script>
+</body>
+</html>

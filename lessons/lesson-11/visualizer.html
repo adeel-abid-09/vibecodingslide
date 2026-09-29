@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 11 | Side Effects & Fetching Data</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">11</div>
+      <span>Lesson 11: useEffect & Fetch</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-10/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 10</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-12/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 12 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-frontend">Module 3 &bull; Class 11 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Fetching Real Data (useEffect & Axios)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Avoid the infinite loop trap, master the empty dependency array, and gracefully handle Loading, Error, and Success states.
+      </p>
+    </div>
+
+    <!-- Interactive 3-State Simulator -->
+    <div class="section-block">
+      <h2>📡 Interactive 3-State Fetch Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click below to simulate how modern React interfaces handle network delays and server errors:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <button class="btn btn-primary" onclick="simulateFetch(true)">Simulate Successful Fetch (200 OK)</button>
+          <button class="btn btn-secondary" onclick="simulateFetch(false)" style="color: #f43f5e;">Simulate Network Failure (500 Error)</button>
+        </div>
+
+        <div style="margin-top: 1rem; background: #060911; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; min-height: 180px; display: flex; align-items: center; justify-content: center;">
+          <div id="fetchPreview" style="width: 100%; text-align: center;">
+            <span style="color: var(--text-faint);">Click one of the buttons above to trigger useEffect...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The useEffect Data Fetching Cycle</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant React as Component Mounts
+    participant Hook as useEffect(fn, [])
+    participant API as Backend API
+
+    React->>React: Initial render (isLoading = true)
+    React->>Hook: Triggers effect once
+    Hook->>API: axios.get('/api/posts')
+    API-->>Hook: Returns JSON Array
+    Hook->>React: setPosts(data), setIsLoading(false)
+    React->>React: Re-render: maps items to UI cards
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        client/src/<br>
+        ├── services/<br>
+        │   └── <span class="highlight">api.js</span> <span class="desc">← Axios instance with backend base URL</span><br>
+        ├── pages/<br>
+        │   └── <span class="highlight">FeedPage.jsx</span> <span class="desc">← Uses useEffect, manages loading/error/data states</span><br>
+        └── components/<br>
+            └── <span class="highlight">PostCard.jsx</span> <span class="desc">← Rendered inside posts.map(p => ...)</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Robust 3-State Data Fetching</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt11')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt11">I am building a React page at `client/src/pages/FeedPage.jsx` using Vite and `axios`.
+
+Requirements:
+- Call `http://localhost:5000/api/posts` inside a `useEffect` hook that runs only once on mount.
+- Manage 3 state variables:
+  - `posts` (Array, default `[]`)
+  - `isLoading` (Boolean, default `true`)
+  - `error` (String or null, default `null`)
+- Render:
+  - If `isLoading`, show a clean spinning loader.
+  - If `error`, show a styled red banner with an error message and a "Retry" button.
+  - If data is loaded and empty, show "No posts found".
+  - If data exists, map over posts and render `<PostCard key={post._id} post={post} />`.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Side Effect</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Any operation that reaches outside of a component's pure rendering logic (e.g. fetching data from an external API, setting timers, or altering browser storage).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Mounting</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The exact moment when a React component is first rendered and inserted into the browser's visible DOM tree.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`useEffect`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The React hook used to safely run side effects after a component mounts or after specified state values change.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Dependency Array `[]`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The second argument passed to `useEffect`: an empty array `[]` tells React to run the effect only once when the component first mounts.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Axios</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A popular, feature-rich promise-based HTTP client library for JavaScript used to make GET, POST, and DELETE requests to backend APIs.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Loading State</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A temporary UI state displayed while waiting for asynchronous network data to arrive, preventing blank screens using spinners or skeleton loaders.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">List Key (`key={item._id}`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A unique string attribute required by React when mapping over lists so it can track, update, or remove individual elements efficiently.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The Empty Dependency Array `[]`:</strong> Always pass `[]` as the second argument to `useEffect` to ensure it only runs once when the component appears.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The 3 UI States:</strong> Never leave users staring at a blank screen. Always design for Loading (spinner), Error (banner), and Success (cards).
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Every Mapped Element Needs a `key`:</strong> React requires `key={item._id}` so it can efficiently update DOM elements when items change.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function simulateFetch(isSuccess) {
+      const p = document.getElementById('fetchPreview');
+      p.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.8rem;">
+          <div style="width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <span style="font-size: 0.85rem; color: var(--accent-cyan);">State 1: isLoading = true (Waiting for server...)</span>
+        </div>
+      `;
+
+      setTimeout(() => {
+        if (isSuccess) {
+          p.innerHTML = `
+            <div style="text-align: left;">
+              <div style="font-size: 0.8rem; color: #10b981; margin-bottom: 0.8rem; font-weight: 600;">State 3: Success! Rendered 2 Cards using posts.map():</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <h4 style="font-size: 1rem; color: #fff;">Modern React Fundamentals</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">By Sarah Connor &bull; 10 min read</p>
+                </div>
+                <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <h4 style="font-size: 1rem; color: #fff;">Full-Stack AI Architecture</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">By John Doe &bull; 15 min read</p>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          p.innerHTML = `
+            <div style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.4); padding: 1rem 1.5rem; border-radius: 8px; color: #f43f5e; text-align: center;">
+              <strong>State 2: Error 500!</strong> Failed to fetch posts from backend.<br>
+              <button class="btn btn-secondary" onclick="simulateFetch(true)" style="margin-top: 0.8rem; font-size: 0.8rem; padding: 0.3rem 0.8rem;">Try Again</button>
+            </div>
+          `;
+        }
+      }, 1200);
+    }
+  </script>
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>

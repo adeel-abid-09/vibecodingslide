@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 10 | State & Interactivity (useState)</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">10</div>
+      <span>Lesson 10: React useState</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-09/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 09</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-11/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 11 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-frontend">Module 3 &bull; Class 10 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">State & Interactivity (useState Hook)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the component memory lifecycle, event triggers, controlled form bindings, and UI reactivity.
+      </p>
+    </div>
+
+    <!-- Interactive State Simulator -->
+    <div class="section-block">
+      <h2>⚡ Interactive React State Inspector</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click the buttons or type into the input to observe how React state variables drive immediate UI re-renders:
+      </p>
+
+      <div class="sim-container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <!-- Interactive Widget -->
+          <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Live Component UI</h3>
+            
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+              <button class="btn btn-secondary" onclick="updateCount(-1)">-</button>
+              <span id="countDisplay" style="font-size: 1.6rem; font-weight: 700; color: var(--accent-cyan); min-width: 40px; text-align: center;">0</span>
+              <button class="btn btn-primary" onclick="updateCount(1)">+</button>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Controlled Input (Type message):</label>
+              <input type="text" id="simInput" placeholder="Type something..." oninput="updateText()" style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.6rem; border-radius: 6px; width: 100%;">
+            </div>
+          </div>
+
+          <!-- React Internal Memory View -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.5rem;">REACT INTERNAL STATE SNAPSHOT:</div>
+            <div id="stateMemoryLog" style="background: #030712; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; color: #a5b4fc; min-height: 160px; line-height: 1.6;">
+              // React Component Memory<br>
+              const [count, setCount] = useState(<span style="color: #f59e0b;">0</span>);<br>
+              const [text, setText] = useState(<span style="color: #10b981;">""</span>);<br>
+              <br>
+              <span style="color: var(--text-faint);">// Status: Ready for user events</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The React Re-render Engine</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart LR
+    Event[User clicks button] --> Dispatch[setCount(count + 1)]
+    Dispatch --> StateMemory[State variable updates]
+    StateMemory --> VirtualDOM[React re-evaluates JSX]
+    VirtualDOM --> Patch[Updates exact DOM node]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        client/src/<br>
+        ├── components/<br>
+        │   ├── <span class="highlight">Counter.jsx</span> <span class="desc">← Component using const [count, setCount] = useState(0)</span><br>
+        │   └── <span class="highlight">TaskForm.jsx</span> <span class="desc">← Controlled inputs with onChange and e.preventDefault()</span><br>
+        └── <span>App.jsx</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Controlled Form with State</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt10')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt10">I am building a React component using Vite and `useState`.
+Please create an interactive form component at `client/src/components/CreateTaskForm.jsx`.
+
+Requirements:
+- Fields in state:
+  - `title` (String, required)
+  - `priority` (String, default 'medium', options: 'low', 'medium', 'high')
+- Handle form submission `onSubmit`:
+  - Prevent default browser page reload (`e.preventDefault()`).
+  - If title is empty, show a small red error message below the input.
+  - If valid, invoke an `onAddTask(newTask)` callback prop and reset the form inputs to empty strings.
+- Add smooth button hover and active states.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">State</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The internal memory of a React component that holds values that can change over time based on user interactions (e.g. typing, clicking, toggling).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">React Hook</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Special functions provided by React (starting with `use`, like `useState` or `useEffect`) that allow functional components to tap into state and lifecycle features.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`useState`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The core React hook that declares a state variable and gives you an updater function (e.g. `const [count, setCount] = useState(0)`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Re-render</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The process where React re-executes a component function and repaints the screen because one of its state variables changed.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Event Handler</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A function triggered in response to a user action in the browser (e.g. `onClick`, `onChange`, `onSubmit`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Controlled Component</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An input form element whose display value is strictly controlled by React state (`value={text}` and `onChange={e => setText(e.target.value)}`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`e.preventDefault()`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A method called on form submission events that cancels the browser's default behavior of reloading the entire webpage.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>State Powers the UI:</strong> You never alter DOM text by hand in React. You update state (`setCount`), and React repaints the screen.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Controlled Inputs:</strong> The value of every form field is bound to state (`value={name}`), and synced on every keypress with `onChange`.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Prevent Page Reloads:</strong> Always call `e.preventDefault()` inside your `onSubmit` handler to prevent the browser from reloading the page.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let count = 0;
+
+    function updateCount(delta) {
+      count += delta;
+      document.getElementById('countDisplay').innerText = count;
+      refreshStateLog();
+    }
+
+    function updateText() {
+      refreshStateLog();
+    }
+
+    function refreshStateLog() {
+      const txt = document.getElementById('simInput').value;
+      document.getElementById('stateMemoryLog').innerHTML = `
+// React Component Memory<br>
+const [count, setCount] = useState(<span style="color: #f59e0b;">${count}</span>);<br>
+const [text, setText] = useState(<span style="color: #10b981;">"${txt}"</span>);<br>
+<br>
+<span style="color: #10b981;">// State changed! React re-rendered UI in ~1.2ms</span>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 09 | React Thinking & Components</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">09</div>
+      <span>Lesson 09: React Components</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-08/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 08</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-10/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 10 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-frontend">Module 3 &bull; Class 09 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">React Thinking & Reusable Components</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Understand Single Page Applications, break web designs into modular component trees, and master passing props.
+      </p>
+    </div>
+
+    <!-- Interactive Props Playground -->
+    <div class="section-block">
+      <h2>🧩 Interactive Component & Props Playground</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Change the props on the left to see how React re-renders the component in real time:
+      </p>
+
+      <div class="sim-container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.8rem;">PARENT COMPONENT (App.jsx) PROPS PASSED:</div>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">title prop:</label>
+                <input type="text" id="propTitle" value="Wireless Headphones" oninput="renderCard()" style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px; width: 100%;">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">price prop ($):</label>
+                <input type="number" id="propPrice" value="199" oninput="renderCard()" style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px; width: 100%;">
+              </div>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; margin-top: 0.3rem;">
+                <input type="checkbox" id="propInStock" checked onchange="renderCard()"> inStock prop (true / false)
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.8rem;">CHILD COMPONENT (ProductCard.jsx) RENDERED:</div>
+            <div id="cardPreview" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; transition: all 0.2s;">
+              <!-- Dynamic Card -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The React Component Tree</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    App[App.jsx: Root Parent] --> Nav[Navbar.jsx]
+    App --> Home[HomePage.jsx]
+    App --> Foot[Footer.jsx]
+
+    Home --> Hero[HeroBanner.jsx]
+    Home --> Grid[ProductGrid.jsx]
+
+    Grid --> C1["ProductCard (title='Watch')"]
+    Grid --> C2["ProductCard (title='Laptop')"]
+    Grid --> C3["ProductCard (title='Shoes')"]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        client/src/<br>
+        ├── components/<br>
+        │   └── <span class="highlight">ProductCard.jsx</span> <span class="desc">← Modular, reusable component accepting props</span><br>
+        ├── pages/<br>
+        │   └── <span class="highlight">HomePage.jsx</span> <span class="desc">← Assembles multiple components into a full page</span><br>
+        ├── <span class="highlight">App.jsx</span> <span class="desc">← Top-level component mounted into DOM</span><br>
+        └── <span>main.jsx</span> <span class="desc">← ReactDOM.createRoot(document.getElementById('root'))</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Modular Component with Props</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt9')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt9">I am building a React frontend using Vite.
+Please create a reusable component at `client/src/components/ProductCard.jsx`.
+
+Requirements:
+- Accept props: `title`, `price`, `imageUrl`, `rating`, `inStock`.
+- Design: Clean modern dark card with rounded borders and a glowing hover effect.
+- If `inStock` is false, show a red "Sold Out" badge and disable the button.
+- Include a button: "Add to Bag" with a hover state.
+- Show me how to import and use 3 instances of `<ProductCard />` inside `client/src/App.jsx`.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">SPA (Single Page Application)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A modern web architecture where the browser loads one single HTML page, and JavaScript dynamically updates the screen without white flashes or page reloads.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Component</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An independent, reusable piece of user interface (like a button, card, or navbar) written as a JavaScript function that returns JSX.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">JSX (JavaScript XML)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A syntax extension for JavaScript that looks like HTML, allowing you to design user interfaces directly inside your React components.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Props (Properties)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Read-only arguments passed from a parent component down to a child component (e.g. `<ProductCard title="Phone" price={799} />`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Component Tree</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The hierarchical parent-child diagram showing how components are nested inside each other to form a complete webpage.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Virtual DOM</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">React's lightweight in-memory copy of the real browser DOM, used to calculate the fastest, minimal updates before repainting the screen.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Vite</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A blazing-fast next-generation frontend build tool and development server used to create modern React applications.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Components are Custom Lego Bricks:</strong> Break any webpage into independent, reusable functions that return visual JSX.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Props Flow Downwards:</strong> Parents give data to children through props (`<Card title="Phone" />`); children never alter parent props directly.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>SPA Fluidity:</strong> React updates only the specific elements that changed without ever reloading the entire browser window.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function renderCard() {
+      const title = document.getElementById('propTitle').value || 'Product Title';
+      const price = document.getElementById('propPrice').value || '0';
+      const inStock = document.getElementById('propInStock').checked;
+
+      const preview = document.getElementById('cardPreview');
+      preview.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+          <h3 style="font-size: 1.15rem; color: #fff;">${title}</h3>
+          <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; ${inStock ? 'background: rgba(16,185,129,0.15); color: #10b981;' : 'background: rgba(244,63,94,0.15); color: #f43f5e;'}">
+            ${inStock ? 'In Stock' : 'Sold Out'}
+          </span>
+        </div>
+        <p style="font-size: 1.3rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 1.2rem;">$${price}</p>
+        <button class="btn btn-primary" ${inStock ? '' : 'disabled'} style="width: 100%; opacity: ${inStock ? '1' : '0.5'};">
+          ${inStock ? 'Add to Cart' : 'Unavailable'}
+        </button>
+      `;
+    }
+
+    renderCard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 03 | JavaScript as System Glue</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">03</div>
+      <span>Lesson 03: JavaScript Data Shapes</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-02/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 02</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-04/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 04 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-foundation">Module 1 &bull; Class 03 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">JavaScript as System Glue (Data Shapes)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Learn to trace data shapes (Objects & Arrays), master async/await, and understand JSON without memorizing syntax.
+      </p>
+    </div>
+
+    <!-- Interactive Data Inspector -->
+    <div class="section-block">
+      <h2>🔍 Interactive JSON Data Shape Inspector</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Click any property button below to see the exact code used to access that piece of data from a real server payload:
+      </p>
+
+      <div class="sim-container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <div style="background: #060911; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; color: #94a3b8;">
+            <div style="color: var(--accent-cyan); margin-bottom: 0.5rem;">// Sample Server Response: user</div>
+            {<br>
+            &nbsp;&nbsp;<span style="color: #f43f5e;">"name"</span>: <span style="color: #10b981;">"Sarah Connor"</span>,<br>
+            &nbsp;&nbsp;<span style="color: #f43f5e;">"role"</span>: <span style="color: #10b981;">"Admin"</span>,<br>
+            &nbsp;&nbsp;<span style="color: #f43f5e;">"orders"</span>: [<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color: #f43f5e;">"id"</span>: 101, <span style="color: #f43f5e;">"item"</span>: <span style="color: #10b981;">"Keyboard"</span>, <span style="color: #f43f5e;">"price"</span>: 120 },<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color: #f43f5e;">"id"</span>: 102, <span style="color: #f43f5e;">"item"</span>: <span style="color: #10b981;">"Monitor"</span>, <span style="color: #f43f5e;">"price"</span>: 350 }<br>
+            &nbsp;&nbsp;]<br>
+            }
+          </div>
+
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem; font-weight: 600;">CLICK PROPERTY TO EXTRACT:</div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <button class="btn btn-secondary" onclick="inspect('user.name', 'Sarah Connor')">Extract User's Name</button>
+              <button class="btn btn-secondary" onclick="inspect('user.role', 'Admin')">Extract User's Role</button>
+              <button class="btn btn-secondary" onclick="inspect('user.orders[0].item', 'Keyboard')">Extract 1st Order Item</button>
+              <button class="btn btn-secondary" onclick="inspect('user.orders[1].price', '$350')">Extract 2nd Order Price</button>
+            </div>
+
+            <div class="sim-screen" style="margin-top: 1rem; min-height: 80px;">
+              <div style="font-size: 0.75rem; color: var(--text-faint);">JAVASCRIPT EXPRESSION:</div>
+              <div id="codePath" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent-cyan); font-weight: 600;">
+                Click any button above
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-faint); margin-top: 0.4rem;">EVALUATED VALUE:</div>
+              <div id="codeVal" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent-emerald);">
+                -
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Async/Await Diagram -->
+    <div class="section-block">
+      <h2>⏳ The Async / Await Mental Model</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Why do we use `await`? Because servers live thousands of miles away:
+      </p>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant App as Browser Code
+    participant API as External Server
+
+    App->>App: 1. Code executes instantly (Line 1, Line 2)
+    App->>API: 2. const res = await fetch("/api/data")
+    Note over App: ⏸️ Function PAUSES here without freezing browser
+    Note over API: Server processes query & builds response (150ms)
+    API-->>App: 3. Returns HTTP Response (Status 200)
+    App->>App: 4. Function RESUMES and unpacks data!
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        my-project/<br>
+        ├── <span class="highlight">index.html</span> <span class="desc">← Mounts the script tag</span><br>
+        ├── <span class="highlight">script.js</span> <span class="desc">← All functions, fetch logic, and data handling</span><br>
+        └── <span>data.json</span> <span class="desc">← Mock database structure</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Mental Tracing of Async Code</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt3')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt3">Here is a JavaScript function:
+
+async function getDashboardData(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}/stats`);
+    const data = await res.json();
+    return data.filter(item => item.active === true);
+  } catch (err) {
+    console.error('Error fetching data', err);
+  }
+}
+
+Please explain:
+1. What does `async` and `await` do here in plain English?
+2. What shape of data does `data.filter` expect (Object, Array, or String)?
+3. If the server is offline, which line runs?</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Primitive Data Types</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The simplest building blocks of data: String (text), Number (digits), Boolean (true/false), null (intentional emptiness), and undefined (unassigned variable).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Object `{}`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A container that groups related properties and values under labeled keys (e.g. `{ name: "Laptop", price: 999 }`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Array `[]`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An ordered list of items accessed by their numerical index starting at 0 (e.g. `["Apple", "Banana", "Cherry"]`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">JSON (JavaScript Object Notation)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The lightweight, human-readable universal text standard used across the internet to exchange data between clients, servers, and databases.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Function</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A reusable machine of code that takes Inputs (arguments/parameters), runs a calculation or transformation, and gives back an Output (return value).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Asynchronous (Async)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Code that runs in the background without freezing the rest of your program while waiting for slow operations (like fetching data from a server 3,000 miles away).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`await`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A JavaScript keyword placed before a slow asynchronous task that says: "Pause this function right here until the server replies, but let the rest of the computer keep running."</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Array Methods (.map, .filter)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">`.map()` transforms every item in an array into something new (like converting raw objects into HTML cards). `.filter()` weeds out unwanted items based on a condition.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Objects vs Arrays:</strong> An Object `{ key: "value" }` describes one thing; an Array `[ item1, item2 ]` holds a list of things.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Dot Notation:</strong> `user.orders[0].price` walks directly down the JSON tree to grab the exact piece of data needed for the UI.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Async/Await is Waiting:</strong> You use `await` whenever you reach outside your computer (fetching from an API or reading a database).
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function inspect(path, val) {
+      document.getElementById('codePath').innerText = path;
+      document.getElementById('codeVal').innerText = val;
+    }
+  </script>
+</body>
+</html>

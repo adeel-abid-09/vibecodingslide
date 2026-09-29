@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 01 | How the Web Works & AI Setup</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    /* Ultra-Detailed Simulator Screens */
+    .screen-window {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .screen-window.active-node {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .window-header {
+      background: #0f1523;
+      padding: 0.6rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .window-title {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .mock-address-bar {
+      background: #060911;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.3rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem;
+    }
+
+    .screen-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      font-size: 0.85rem;
+    }
+
+    /* Packet animation track */
+    .network-track {
+      background: #070a12;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      margin: 1.5rem 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .packet-badge {
+      padding: 0.4rem 0.9rem;
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-cyan));
+      border-radius: 20px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">01</div>
+      <span>Lesson 01: Web Mental Model</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Portal</a>
+      <a href="../lesson-02/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 02 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-foundation">Module 1 &bull; Class 01 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">How the Web Works & The AI Setup</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the fundamental Client-Server-Database triad with this live multi-screen system simulator.
+      </p>
+    </div>
+
+    <!-- Flagship Detailed Simulator -->
+    <div class="section-block flagship-simulator" id="interactiveSimulatorBlock">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+        <div>
+          <h2>⚡ Interactive Web Request Simulator</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Watch real HTTP packets travel across simulated Client (Browser), Server (Express), and Database (MongoDB Atlas) screens.
+          </p>
+        </div>
+        
+        <!-- Scenario Picker & Fullscreen Controls -->
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--text-faint); font-weight: 600;">SCENARIO:</span>
+            <select id="scenarioSelect" onchange="resetSim()" style="background: #0f172a; color: #fff; border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+              <option value="get_menu">1. Happy Path: GET /api/menu (Status 200 OK)</option>
+              <option value="post_order">2. Create Record: POST /api/orders (Status 201 Created)</option>
+              <option value="not_found">3. Route Mistake: GET /api/unknown (Status 404 Not Found)</option>
+              <option value="server_error">4. Backend Crash: Database Timeout (Status 500 Server Error)</option>
+            </select>
+          </div>
+          <button type="button" class="btn-fullscreen" onclick="window.toggleInteractiveFullscreen(document.getElementById('interactiveSimulatorBlock'))" title="Show in Fullscreen Presentation Mode (F)">
+            <span>⛶</span> <span>Fullscreen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="sim-container" style="margin-top: 0;">
+        <div class="sim-controls" style="margin-bottom: 1.25rem;">
+          <button id="playBtn" class="btn btn-primary" onclick="autoPlay()">⚡ Auto-Play Cycle</button>
+          <button id="stepBtn" class="btn btn-secondary" onclick="nextStep()">Step Forward ▶</button>
+          <button class="btn btn-secondary" onclick="resetSim()">↺ Reset</button>
+          <span id="stepIndicator" class="step-badge">Step 0: Idle</span>
+          <span id="explanationText" style="color: var(--text-muted); font-size: 0.85rem; margin-left: 0.5rem;">Select a scenario and click Auto-Play or Step Forward.</span>
+        </div>
+
+        <!-- Animated Highway -->
+        <div class="network-track">
+          <div style="font-size: 0.75rem; color: var(--text-faint); font-weight: 700;">BROWSER (5173)</div>
+          <div id="packet" class="packet-badge" style="left: 0;">
+            📦 HTTP GET /api/menu
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-faint); font-weight: 700;">EXPRESS (5000)</div>
+          <div style="font-size: 0.75rem; color: var(--text-faint); font-weight: 700;">MONGO ATLAS</div>
+        </div>
+
+        <!-- 3 Rich Screens Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 1rem;">
+          
+          <!-- Screen 1: Browser UI -->
+          <div id="screenClient" class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="window-title">💻 Client (Google Chrome)</span>
+              <span></span>
+            </div>
+            
+            <div class="mock-address-bar">
+              <span style="color: #10b981;">🔒</span>
+              <span>http://localhost:5173</span><span style="color: #fff;" id="barPath">/menu</span>
+            </div>
+
+            <div class="screen-body">
+              <div style="font-weight: 700; color: #fff; margin-bottom: 0.5rem;">🍔 Bistro Express UI</div>
+              
+              <div id="browserCanvas" style="background: #030712; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem; min-height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <span style="color: var(--text-faint); font-size: 0.8rem;">Click "Auto-Play" to load menu items...</span>
+              </div>
+
+              <!-- DevTools Drawer -->
+              <div style="margin-top: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 0.6rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-faint); font-weight: 700; margin-bottom: 0.3rem;">
+                  <span>NETWORK TAB (XHR)</span>
+                  <span id="clientStatusBadge" style="color: var(--text-faint);">-</span>
+                </div>
+                <div id="clientNetLog" style="font-family: var(--font-mono); font-size: 0.72rem; color: #94a3b8; background: #040711; padding: 0.4rem 0.6rem; border-radius: 4px;">
+                  Waiting for trigger...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen 2: Express Server Terminal -->
+          <div id="screenServer" class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="window-title">⚙️ Server (Node.js Terminal)</span>
+              <span style="font-size: 0.7rem; color: var(--accent-emerald);">● PORT 5000</span>
+            </div>
+
+            <div class="screen-body">
+              <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #a5b4fc; margin-bottom: 0.4rem;">
+                $ nodemon server.js
+              </div>
+
+              <div id="serverTerminal" style="background: #030712; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; color: #cbd5e1; flex: 1; min-height: 180px; overflow-y: auto; line-height: 1.6;">
+                [INFO] Express server listening on :5000<br>
+                [INFO] Database connection established.<br>
+                <span style="color: var(--text-faint);">[IDLE] Waiting for incoming HTTP connections...</span>
+              </div>
+
+              <div style="margin-top: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 0.6rem; font-size: 0.7rem; color: var(--text-faint); display: flex; justify-content: space-between;">
+                <span>ACTIVE ROUTE:</span>
+                <span id="serverRouteBadge" style="color: var(--accent-cyan); font-family: var(--font-mono);">routes/menu.js</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen 3: MongoDB Atlas Cloud UI -->
+          <div id="screenDb" class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="window-title">🗄️ MongoDB Cloud Atlas</span>
+              <span style="font-size: 0.7rem; color: var(--accent-purple);">Cluster0</span>
+            </div>
+
+            <div class="screen-body">
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.4rem;">
+                <span>COLLECTION: <strong style="color: #fff;">bistro.menuitems</strong></span>
+                <span id="docCountBadge" style="color: var(--accent-emerald);">3 Docs</span>
+              </div>
+
+              <div id="dbInspector" style="background: #030712; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.73rem; color: #cbd5e1; flex: 1; min-height: 180px; overflow-y: auto; line-height: 1.5;">
+                <div style="color: var(--accent-cyan);">// Query Filter: {}</div>
+                {<br>
+                &nbsp;&nbsp;"_id": "660fa110",<br>
+                &nbsp;&nbsp;"name": "Truffle Burger",<br>
+                &nbsp;&nbsp;"price": 14.50<br>
+                }<br>
+                {<br>
+                &nbsp;&nbsp;"_id": "660fa111",<br>
+                &nbsp;&nbsp;"name": "Crispy Fries",<br>
+                &nbsp;&nbsp;"price": 5.00<br>
+                }
+              </div>
+
+              <div style="margin-top: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 0.6rem; font-size: 0.7rem; color: var(--text-faint); display: flex; justify-content: space-between;">
+                <span>DATABASE LATENCY:</span>
+                <span style="color: #10b981; font-family: var(--font-mono);">14ms</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 System Architecture Diagram</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        You can copy this Mermaid diagram directly into Excalidraw, Notion, or GitHub markdown to teach:
+      </p>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as User (Browser / React)
+    participant Server as Server (Node.js / Express)
+    participant DB as Database (MongoDB)
+
+    User->>Server: HTTP Request (GET /api/products)
+    Note over Server: Validates request & routes to controller
+    Server->>DB: Query: Product.find()
+    DB-->>Server: Returns 12 Product Documents (JSON)
+    Note over Server: Sets HTTP Status: 200 OK
+    Server-->>User: HTTP Response with JSON Data
+    Note over User: React updates state & paints UI cards
+        </pre>
+      </div>
+    </div>
+
+    <!-- Where Does It Go? -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Even on Day 1, know where your configuration files live:
+      </p>
+      <div class="file-tree">
+        my-project/<br>
+        ├── <span class="highlight">package.json</span> <span class="desc">← The project passport: lists dependencies, scripts & name</span><br>
+        ├── <span class="highlight">.gitignore</span> <span class="desc">← Security shield: prevents node_modules & passwords from going to GitHub</span><br>
+        └── <span>README.md</span> <span class="desc">← Documentation for humans & AI context</span>
+      </div>
+    </div>
+
+    <!-- Copyable AI Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <p style="color: var(--text-muted); margin-bottom: 0.5rem;">
+        Have students click to copy this prompt into their AI assistant:
+      </p>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Verify Developer Environment</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt1')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt1">I am an absolute beginner setting up my computer for modern web development.
+I have a [Mac / Windows] computer.
+Please give me 3 terminal commands to check if I have:
+1. Node.js installed
+2. npm installed
+3. Git installed
+And explain what each output means in one simple sentence.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Client (Frontend)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The part of a website the user directly sees, touches, and interacts with in their web browser (HTML, CSS, JavaScript, React). Analogy: The dining room of a restaurant.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Server (Backend)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A computer running software (like Node.js & Express) that listens for requests over the internet, enforces security rules, and processes data. Analogy: The kitchen and waitstaff.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Database</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A dedicated storage vault (like MongoDB) designed to store, organize, and retrieve persistent records safely. Analogy: The restaurant pantry and walk-in freezer.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">HTTP Request</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A formal digital message sent from the Client to the Server asking to fetch or change data (e.g. "Please send me the menu").</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">HTTP Response</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The reply sent back from the Server to the Client containing a status code (like 200 OK) and usually data in JSON format.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Terminal / CLI</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Command Line Interface: A direct text-based conversation with your computer operating system where you type commands instead of clicking icons.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Node.js</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A runtime engine that allows JavaScript to run directly on your computer or server, outside of a web browser.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">npm (Node Package Manager)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The world's largest registry of free, pre-written code packages and tools that you can install in one command (like express or mongoose).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Git & GitHub</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Git is a time-machine tool that tracks code history and changes. GitHub is a cloud platform where you store and share your Git repositories.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways Checklist -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <p style="color: var(--text-muted);">Every student must verify they understand these before leaving today's class:</p>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Client vs Server vs Database:</strong> The client is what the user touches (browser); the server is the brain/gatekeeper; the database is the permanent storage closet.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The Security Golden Rule:</strong> Never connect frontend code directly to the database. All sensitive queries go through the server.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The Terminal is Just a Chat Window:</strong> It's simply a text conversation directly with your computer's operating system.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    // Step Machine State
+    let currentStep = 0;
+    let isAutoPlaying = false;
+    let autoTimer = null;
+
+    const sClient = document.getElementById('screenClient');
+    const sServer = document.getElementById('screenServer');
+    const sDb = document.getElementById('screenDb');
+    const packet = document.getElementById('packet');
+    const stepBadge = document.getElementById('stepIndicator');
+    const explanation = document.getElementById('explanationText');
+    const bCanvas = document.getElementById('browserCanvas');
+    const cNetLog = document.getElementById('clientNetLog');
+    const cStatus = document.getElementById('clientStatusBadge');
+    const sTerm = document.getElementById('serverTerminal');
+    const dbInspector = document.getElementById('dbInspector');
+
+    function resetSim() {
+      clearTimeout(autoTimer);
+      isAutoPlaying = false;
+      currentStep = 0;
+      stepBadge.innerText = 'Step 0: Idle';
+      explanation.innerText = 'Select a scenario and click Auto-Play or Step Forward.';
+      
+      sClient.classList.remove('active-node');
+      sServer.classList.remove('active-node');
+      sDb.classList.remove('active-node');
+
+      packet.style.left = '0%';
+      packet.style.background = 'linear-gradient(135deg, var(--accent-indigo), var(--accent-cyan))';
+
+      const sc = document.getElementById('scenarioSelect').value;
+      if (sc === 'get_menu') {
+        packet.innerText = '📦 GET /api/menu';
+        bCanvas.innerHTML = '<span style="color: var(--text-faint); font-size: 0.8rem;">Click Auto-Play to request menu...</span>';
+      } else if (sc === 'post_order') {
+        packet.innerText = '📦 POST /api/orders';
+        bCanvas.innerHTML = '<span style="color: var(--text-faint); font-size: 0.8rem;">Submitting order payload...</span>';
+      } else if (sc === 'not_found') {
+        packet.innerText = '📦 GET /api/unknown';
+        bCanvas.innerHTML = '<span style="color: var(--text-faint); font-size: 0.8rem;">Requesting unknown path...</span>';
+      } else if (sc === 'server_error') {
+        packet.innerText = '📦 GET /api/menu';
+        bCanvas.innerHTML = '<span style="color: var(--text-faint); font-size: 0.8rem;">Simulating database crash...</span>';
+      }
+
+      cNetLog.innerText = 'Waiting for trigger...';
+      cStatus.innerText = '-';
+      cStatus.style.color = 'var(--text-faint)';
+      sTerm.innerHTML = `[INFO] Express server listening on :5000<br>[INFO] Database connected.<br><span style="color: var(--text-faint);">[IDLE] Waiting for incoming connections...</span>`;
+    }
+
+    function autoPlay() {
+      resetSim();
+      isAutoPlaying = true;
+      executeStep(1);
+    }
+
+    function nextStep() {
+      if (currentStep >= 4) {
+        resetSim();
+        return;
+      }
+      executeStep(currentStep + 1);
+    }
+
+    function executeStep(step) {
+      currentStep = step;
+      const sc = document.getElementById('scenarioSelect').value;
+
+      // STEP 1: Browser initiates request
+      if (step === 1) {
+        stepBadge.innerText = 'Step 1: Client Request';
+        explanation.innerText = 'User initiates action. React/Axios packages an HTTP Request packet and sends it across the wire.';
+        
+        sClient.classList.add('active-node');
+        sServer.classList.remove('active-node');
+        sDb.classList.remove('active-node');
+
+        packet.style.left = '10%';
+        cNetLog.innerHTML = `<span style="color: #38bdf8;">Pending:</span> ${packet.innerText} (Origin: :5173)`;
+        cStatus.innerHTML = `<span style="color: #f59e0b;">(pending)</span>`;
+
+        bCanvas.innerHTML = `
+          <div style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); margin-top: 0.4rem;">Axios sending request...</span>
+        `;
+
+        if (isAutoPlaying) autoTimer = setTimeout(() => executeStep(2), 1500);
+      }
+
+      // STEP 2: Express Server receives & inspects
+      else if (step === 2) {
+        stepBadge.innerText = 'Step 2: Server Routing & Middleware';
+        explanation.innerText = 'Express server receives the request on Port 5000. It checks routes, runs middleware, and queries the database.';
+        
+        sClient.classList.remove('active-node');
+        sServer.classList.add('active-node');
+        sDb.classList.remove('active-node');
+
+        packet.style.left = '48%';
+
+        if (sc === 'not_found') {
+          sTerm.innerHTML += `<br><span style="color: #f43f5e;">[ROUTER] 404: No matching route for GET /api/unknown</span>`;
+          if (isAutoPlaying) autoTimer = setTimeout(() => executeStep(4), 1500);
+          return;
+        }
+
+        sTerm.innerHTML += `<br><span style="color: #10b981;">[ROUTER] Match found: /api/menu -> menuController.getMenu()</span>`;
+        sTerm.innerHTML += `<br>[MONGOOSE] Executing: MenuItem.find({})`;
+
+        if (isAutoPlaying) autoTimer = setTimeout(() => executeStep(3), 1500);
+      }
+
+      // STEP 3: MongoDB Database executes query
+      else if (step === 3) {
+        stepBadge.innerText = 'Step 3: Database Query Execution';
+        explanation.innerText = 'MongoDB Atlas receives the query from Mongoose. It finds matching documents and returns raw BSON data.';
+        
+        sClient.classList.remove('active-node');
+        sServer.classList.remove('active-node');
+        sDb.classList.add('active-node');
+
+        packet.style.left = '85%';
+
+        if (sc === 'server_error') {
+          sTerm.innerHTML += `<br><span style="color: #f43f5e;">[FATAL ERROR] MongoServerError: connection timed out after 5000ms</span>`;
+          if (isAutoPlaying) autoTimer = setTimeout(() => executeStep(4), 1500);
+          return;
+        }
+
+        if (sc === 'post_order') {
+          dbInspector.innerHTML += `<br><span style="color: #10b981;">+ Inserted: { _id: "660fa112", item: "Burger", status: "placed" }</span>`;
+        }
+
+        if (isAutoPlaying) autoTimer = setTimeout(() => executeStep(4), 1500);
+      }
+
+      // STEP 4: Return response & React UI update
+      else if (step === 4) {
+        stepBadge.innerText = 'Step 4: Response & UI Render';
+        explanation.innerText = 'Express formats JSON and HTTP status code. Browser receives payload, updates React state, and repaints screen!';
+        
+        sClient.classList.add('active-node');
+        sServer.classList.remove('active-node');
+        sDb.classList.remove('active-node');
+
+        packet.style.left = '0%';
+
+        if (sc === 'not_found') {
+          cStatus.innerHTML = `<span style="color: #f43f5e; font-weight: 700;">404 Not Found</span>`;
+          cNetLog.innerHTML = `<span style="color: #f43f5e;">GET /api/unknown - 404 (Cannot GET /api/unknown)</span>`;
+          bCanvas.innerHTML = `<div style="color: #f43f5e; font-size: 0.8rem; font-weight: 700;">404 Page Not Found</div><p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">The server does not have this route.</p>`;
+          return;
+        }
+
+        if (sc === 'server_error') {
+          cStatus.innerHTML = `<span style="color: #f43f5e; font-weight: 700;">500 Server Error</span>`;
+          cNetLog.innerHTML = `<span style="color: #f43f5e;">GET /api/menu - 500 Internal Server Error</span>`;
+          bCanvas.innerHTML = `<div style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); padding: 0.5rem; border-radius: 6px; color: #f43f5e; font-size: 0.75rem;"><strong>Server Error (500)</strong><br>Check backend terminal logs!</div>`;
+          return;
+        }
+
+        if (sc === 'post_order') {
+          cStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">201 Created</span>`;
+          cNetLog.innerHTML = `<span style="color: #10b981;">POST /api/orders - 201 Created (18ms)</span>`;
+          bCanvas.innerHTML = `
+            <div style="color: #10b981; font-size: 0.85rem; font-weight: 700;">🎉 Order Confirmed!</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Order #660fa112 added to database.</p>
+          `;
+          return;
+        }
+
+        // Default Happy Path
+        cStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">200 OK</span>`;
+        cNetLog.innerHTML = `<span style="color: #10b981;">GET /api/menu - 200 OK (22ms, 1.4KB)</span>`;
+        bCanvas.innerHTML = `
+          <div style="width: 100%; display: flex; flex-direction: column; gap: 0.4rem;">
+            <div style="background: #0f172a; padding: 0.4rem 0.6rem; border-radius: 4px; display: flex; justify-content: space-between; font-size: 0.75rem;">
+              <span>🍔 Truffle Burger</span>
+              <strong style="color: var(--accent-cyan);">$14.50</strong>
+            </div>
+            <div style="background: #0f172a; padding: 0.4rem 0.6rem; border-radius: 4px; display: flex; justify-content: space-between; font-size: 0.75rem;">
+              <span>🍟 Crispy Fries</span>
+              <strong style="color: var(--accent-cyan);">$5.00</strong>
+            </div>
+          </div>
+        `;
+      }
+    }
+  </script>
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>

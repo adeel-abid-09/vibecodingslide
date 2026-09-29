@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 16 | Live Capstone Assembly & Search</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">16</div>
+      <span>Lesson 16: Live Assembly</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-15/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 15</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-17/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 17 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-fullstack">Module 4 &bull; Class 16 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Live Capstone Assembly & Advanced Features</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the 5-step feature assembly loop, implement MongoDB regex search queries, and build dynamic filter bars.
+      </p>
+    </div>
+
+    <!-- Interactive Search Simulator -->
+    <div class="section-block">
+      <h2>🔍 Interactive Search & Filter Visualizer</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Type in the search box or select a category to see the live MongoDB query generated and matching records filtered:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <input type="text" id="searchInput" placeholder="Search by title or company (e.g. React, Google)..." oninput="filterJobs()" style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.6rem 1rem; border-radius: 6px; flex-grow: 1; min-width: 250px;">
+          <select id="catSelect" onchange="filterJobs()" style="background: #030712; color: #fff; border: 1px solid var(--border-color); padding: 0.6rem 1rem; border-radius: 6px;">
+            <option value="all">All Categories</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Design">Design</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 1rem; background: #060911; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">
+          MONGODB QUERY EXECUTED: <span id="queryDisplay" style="color: #cbd5e1;">Job.find({})</span>
+        </div>
+
+        <div id="jobsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+          <!-- Dynamic Job Cards -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The 5-Step Feature Assembly Loop</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart LR
+    S1[1. Schema Check] --> S2[2. Controller & Route]
+    S2 --> S3[3. Thunder Client Test]
+    S3 --> S4[4. React Component]
+    S4 --> S5[5. Connect & Verify]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        my-capstone/<br>
+        ├── server/controllers/<br>
+        │   └── <span class="highlight">jobController.js</span> <span class="desc">← Uses $regex and $options: 'i' for dynamic search</span><br>
+        ├── client/src/components/<br>
+        │   └── <span class="highlight">SearchBar.jsx</span> <span class="desc">← Controlled search input + category filters</span><br>
+        └── client/src/pages/<br>
+            └── <span class="highlight">JobFeedPage.jsx</span> <span class="desc">← Manages search query state and re-fetches API</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: MongoDB Regex Search & Filter API</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt16')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt16">I am building a search feature for my MERN Capstone project.
+Here is my Mongoose model in `server/models/Job.js`:
+- Fields: `title`, `company`, `location`, `salary`, `category`.
+
+Please implement:
+1. In `server/controllers/jobController.js`:
+   - Update `getJobs` to accept query parameters: `?search=` and `?category=`.
+   - If `search` is provided, perform case-insensitive regex matching on `title` or `company`.
+   - If `category` is provided, filter by exact category match.
+   - Return sorted by newest first.
+
+2. In `client/src/components/SearchBar.jsx`:
+   - An input field and category dropdown that passes `(search, category)` back to parent on change.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Debounce</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A programming technique that delays executing a search function until the user stops typing for a few hundred milliseconds, preventing thousands of wasted API calls.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Regex (Regular Expression)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A powerful pattern-matching syntax used in databases and code to search for text strings (e.g. matching partial words or email formats).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Case-Insensitive Search (`$options: "i"`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A MongoDB query parameter that ignores capitalization, allowing "react" to match "React", "REACT", and "reACt".</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Modular Assembly Loop</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The discipline of building and verifying one feature completely (Model ➔ Route ➔ Thunder Client ➔ React UI) before starting the next feature.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Query Filtering</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Combining multiple criteria in a database query (e.g. finding jobs where title matches a search keyword AND category equals "Engineering").</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Never Build Everything at Once:</strong> Use the 5-step assembly loop to build, test, and commit one feature at a time.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Case-Insensitive Search:</strong> In MongoDB, `{ title: { $regex: query, $options: 'i' } }` handles case-agnostic text searching effortlessly.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>API First Testing:</strong> Always test new endpoints with Thunder Client before wiring them to React to isolate bugs immediately.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    const allJobs = [
+      { id: 1, title: "Senior React Developer", company: "Meta", cat: "Engineering", salary: "$140k" },
+      { id: 2, title: "Full-Stack Node/Mongo Architect", company: "Stripe", cat: "Engineering", salary: "$160k" },
+      { id: 3, title: "UI/UX Product Designer", company: "Figma", cat: "Design", salary: "$125k" },
+      { id: 4, title: "Design Systems Lead", company: "Airbnb", cat: "Design", salary: "$135k" }
+    ];
+
+    function filterJobs() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const cat = document.getElementById('catSelect').value;
+
+      const filtered = allJobs.filter(j => {
+        const matchesSearch = j.title.toLowerCase().includes(search) || j.company.toLowerCase().includes(search);
+        const matchesCat = cat === 'all' || j.cat === cat;
+        return matchesSearch && matchesCat;
+      });
+
+      const q = document.getElementById('queryDisplay');
+      let queryStr = "{ ";
+      if (search) queryStr += `title: { $regex: "${search}", $options: "i" } `;
+      if (cat !== 'all') queryStr += `${search ? ', ' : ''}category: "${cat}" `;
+      queryStr += "}";
+      q.innerText = `Job.find(${queryStr})`;
+
+      const grid = document.getElementById('jobsGrid');
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="color: var(--text-faint); grid-column: 1/-1; padding: 1rem;">No jobs match your search filters.</div>';
+        return;
+      }
+
+      filtered.forEach(j => {
+        const card = document.createElement('div');
+        card.style.background = 'var(--bg-card)';
+        card.style.border = '1px solid var(--border-color)';
+        card.style.borderRadius = '10px';
+        card.style.padding = '1.2rem';
+        card.innerHTML = `
+          <div style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.3rem;">${j.cat.toUpperCase()} &bull; ${j.company}</div>
+          <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 0.5rem;">${j.title}</h4>
+          <div style="font-size: 0.9rem; font-weight: 700; color: #10b981;">${j.salary}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    filterJobs();
+  </script>
+</body>
+</html>

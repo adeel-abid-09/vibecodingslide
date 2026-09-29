@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 08 | Authentication & Security (JWT)</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    .jwt-box {
+      background: #060911;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+    }
+    .jwt-header { color: #f43f5e; border-bottom: 1px solid rgba(244,63,94,0.2); padding-bottom: 0.4rem; margin-bottom: 0.4rem; }
+    .jwt-payload { color: #8b5cf6; border-bottom: 1px solid rgba(139,92,246,0.2); padding-bottom: 0.4rem; margin-bottom: 0.4rem; }
+    .jwt-signature { color: #06b6d4; }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">08</div>
+      <span>Lesson 08: JWT & Passwords</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-07/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 07</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-09/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 09 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-backend">Module 2 &bull; Class 08 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Authentication & Security (JWT & Bcrypt)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Learn how passwords are encrypted, how JWT tokens work like digital wristbands, and how middleware protects private routes.
+      </p>
+    </div>
+
+    <!-- Flagship Detailed JWT & Bcrypt Simulator -->
+    <div class="section-block">
+      <h2>🎟️ The JWT & Bcrypt Security Lab</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Part 1: Watch how passwords turn into irreversible one-way hashes. Part 2: Inspect real decoded JWT tokens and test the middleware bouncer:
+      </p>
+
+      <div class="sim-container">
+        
+        <!-- Section A: Bcrypt Hasher -->
+        <div style="background: #070a13; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <div style="font-size: 0.75rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 0.6rem;">
+            1. BCRYPT PASSWORD HASHING MACHINE:
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="plainPass" value="SecretPassword123!" oninput="hashPassword()" placeholder="Enter plain password..." style="background: #020409; color: #fff; border: 1px solid var(--border-color); padding: 0.5rem 0.8rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.82rem; min-width: 220px;">
+            <span style="font-size: 0.75rem; color: var(--text-faint);">➔ bcrypt.hash(salt 10) ➔</span>
+            <div id="hashedOutput" style="background: #020409; border: 1px solid rgba(16,185,129,0.3); padding: 0.5rem 0.8rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.75rem; color: #10b981; flex: 1; word-break: break-all;">
+              $2b$10$vI8aWBnW3fID.ZQ4vO2LNe1kQe7XpT8sV9a...
+            </div>
+          </div>
+        </div>
+
+        <!-- Section B: JWT Debugger & Bouncer -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="issueToken()">🔑 1. Generate & Sign Valid Token</button>
+          <button class="btn btn-secondary" onclick="tamperToken()" style="color: #f43f5e;">⚠️ 2. Tamper With Token (Forge Payload)</button>
+          <button class="btn btn-secondary" onclick="sendToProtected()">🛡️ 3. Request /api/user/profile (Auth Check)</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem;">
+          
+          <!-- JWT io style Decoder -->
+          <div style="background: #030712; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+            <div style="font-size: 0.75rem; color: var(--text-faint); font-weight: 700; margin-bottom: 0.5rem;">
+              JWT TOKEN ANATOMY (Encoded & Decoded):
+            </div>
+            
+            <div id="encodedTokenBadge" style="background: #070b16; border: 1px solid var(--border-color); padding: 0.6rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.72rem; word-break: break-all; margin-bottom: 0.8rem;">
+              <span style="color: #f43f5e;" id="rawHeader">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span style="color: #8b5cf6;" id="rawPayload">eyJpZCI6IjY2MGZhNDgiLCJuYW1lIjoiU2FyYWgiLCJyb2xlIjoiYWRtaW4ifQ</span>.<span style="color: #06b6d4;" id="rawSig">s8F9v0Lm_8KjW9x...</span>
+            </div>
+
+            <div class="jwt-box">
+              <div class="jwt-header">
+                <strong>HEADER:</strong> { "alg": "HS256", "typ": "JWT" }
+              </div>
+              <div class="jwt-payload" id="decodedPayload">
+                <strong>PAYLOAD:</strong> { "id": "660fa48", "name": "Sarah Connor", "role": "admin" }
+              </div>
+              <div class="jwt-signature">
+                <strong>VERIFY SIGNATURE:</strong> HMACSHA256(header + payload, <span style="color: #fff;">process.env.JWT_SECRET</span>)
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouncer Gatekeeper Console -->
+          <div style="background: #030712; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
+            <div style="font-size: 0.75rem; color: var(--text-faint); font-weight: 700; margin-bottom: 0.5rem;">
+              AUTH MIDDLEWARE (THE BOUNCER):
+            </div>
+
+            <div id="bouncerLogView" style="background: #060911; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; color: #cbd5e1; flex: 1; min-height: 160px; line-height: 1.6;">
+              // Click "Request /api/user/profile" to test authorization gatekeeper...
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The JWT Verification Lifecycle</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as User Browser
+    participant Auth as POST /api/auth/login
+    participant Middleware as authMiddleware.js
+    participant Route as GET /api/user/profile
+
+    User->>Auth: Submit credentials (email, password)
+    Note over Auth: bcrypt.compare() validates hash
+    Auth-->>User: Issues JWT Token (Signed with JWT_SECRET)
+    User->>Middleware: GET /api/user/profile with Header: Bearer <token>
+    Note over Middleware: jwt.verify(token, JWT_SECRET)
+    alt Valid Token
+        Middleware->>Route: next() passes request through
+        Route-->>User: HTTP 200 OK + Profile JSON
+    else Invalid or Missing Token
+        Middleware-->>User: HTTP 401 Unauthorized
+    end
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        backend/<br>
+        ├── middleware/<br>
+        │   └── <span class="highlight">authMiddleware.js</span> <span class="desc">← Inspects Authorization header & verifies JWT</span><br>
+        ├── controllers/<br>
+        │   └── <span class="highlight">authController.js</span> <span class="desc">← Hashes password with bcrypt & signs token</span><br>
+        ├── routes/<br>
+        │   └── <span class="highlight">authRoutes.js</span> <span class="desc">← router.get('/profile', protect, getProfile)</span><br>
+        └── <span class="highlight">.env</span> <span class="desc">← JWT_SECRET=my_ultra_secret_key</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Production Auth Middleware & Controller</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt8')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt8">I am building a MERN stack application.
+Please create an authentication flow with JWT and bcrypt:
+
+1. `server/middleware/authMiddleware.js`:
+   - Extracts Bearer token from req.headers.authorization.
+   - Verifies token using jwt.verify(token, process.env.JWT_SECRET).
+   - Fetches user from DB (excluding password) and attaches to req.user.
+   - Returns 401 if missing or invalid.
+
+2. `server/controllers/authController.js`:
+   - registerUser: Hashes password with bcrypt (salt 10) and creates user.
+   - loginUser: Compares password with bcrypt.compare, signs and returns JWT token.
+   - getUserProfile: Returns req.user.
+
+Explain how the protect middleware is plugged into a route in server/routes/authRoutes.js.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Authentication (AuthN)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Verifying "Who are you?" by checking user identity through credentials like an email and password.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Authorization (AuthZ)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Verifying "What are you allowed to do?" (e.g. Can this user delete a post, or only view it? Are they an admin?).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Plain-Text Password</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">An unencrypted password written exactly as typed (e.g. "secret123"). Storing plain text in a database is a dangerous security violation.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Bcrypt Hashing & Salt</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A one-way cryptographic mathematical function that scrambles passwords into an irreversible string, combined with random characters (Salt) to prevent rainbow-table attacks.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">JWT (JSON Web Token)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A compact, URL-safe digital token formatted as `header.payload.signature` that acts as a tamper-proof VIP wristband verifying a logged-in user.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Bearer Token</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The industry-standard format for passing JWT tokens inside the HTTP `Authorization` request header: `Authorization: Bearer <token>`.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Auth Middleware (Guard)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A gatekeeper function that checks if an incoming request contains a valid, unexpired JWT signed with `process.env.JWT_SECRET` before allowing access to private routes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Bcrypt One-Way Hashing:</strong> Passwords are never stored as plain text. They are hashed so that even the database admin cannot see the user's password.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>JWT is a Wristband:</strong> It contains the user's ID inside its payload, signed with a secret key so it cannot be tampered with.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Middleware Gatekeeper:</strong> Placing `protect` inside `router.get('/profile', protect, getProfile)` stops unauthorized users before they ever touch sensitive data.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let isTampered = false;
+    let hasToken = true;
+
+    function hashPassword() {
+      const p = document.getElementById('plainPass').value;
+      let hash = '$2b$10$' + btoa(p + 'SALT123').substring(0, 30) + 'X8aW9...';
+      document.getElementById('hashedOutput').innerText = hash;
+    }
+
+    function issueToken() {
+      isTampered = false;
+      hasToken = true;
+      document.getElementById('rawPayload').innerText = 'eyJpZCI6IjY2MGZhNDgiLCJuYW1lIjoiU2FyYWgiLCJyb2xlIjoiYWRtaW4ifQ';
+      document.getElementById('decodedPayload').innerHTML = `<strong>PAYLOAD:</strong> { "id": "660fa48", "name": "Sarah Connor", "role": "admin" }`;
+      document.getElementById('bouncerLogView').innerHTML = `<span style="color: #10b981;">[ISSUED] Valid JWT signed with JWT_SECRET.</span><br>Bearer token stored in client memory.`;
+    }
+
+    function tamperToken() {
+      isTampered = true;
+      document.getElementById('rawPayload').innerText = 'eyJpZCI6IjY2MGZhNDgiLCJyb2xlIjoic3VwZXJfYWRtaW4ifQ_TAMPERED';
+      document.getElementById('decodedPayload').innerHTML = `<strong>PAYLOAD (FORGED):</strong> { "role": "<span style="color: #f43f5e;">super_admin</span>" } <span style="color: #f43f5e;">[SIGNATURE MISMATCH]</span>`;
+      document.getElementById('bouncerLogView').innerHTML = `<span style="color: #f59e0b;">[WARNING] Client altered the token payload! Signature is no longer valid.</span>`;
+    }
+
+    function sendToProtected() {
+      const log = document.getElementById('bouncerLogView');
+      if (isTampered) {
+        log.innerHTML = `
+<span style="color: #f43f5e; font-weight: 700;">HTTP 401 Unauthorized: JsonWebTokenError</span><br>
+Auth Middleware: "invalid signature".<br>
+=> Bouncer blocked access to /api/user/profile.
+        `;
+      } else if (hasToken) {
+        log.innerHTML = `
+<span style="color: #10b981; font-weight: 700;">HTTP 200 OK: Access Granted!</span><br>
+Auth Middleware: Signature matches JWT_SECRET.<br>
+Decoded user attached to req.user.<br>
+=> Returned: { name: "Sarah Connor", email: "sarah@resistance.org" }
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

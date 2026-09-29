@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 13 | Frontend Auth & Protected Routes</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">13</div>
+      <span>Lesson 13: Frontend Auth</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-12/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 12</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-14/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 14 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-frontend">Module 3 &bull; Class 13 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Frontend Auth & Protected Routes</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the React Context API for global user state, token persistence in localStorage, and locking down private pages.
+      </p>
+    </div>
+
+    <!-- Interactive Auth Shield Simulator -->
+    <div class="section-block">
+      <h2>🛡️ Interactive Protected Route Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Toggle user authentication state to see how the Navbar and Protected Route Shield respond:
+      </p>
+
+      <div class="sim-container">
+        <!-- Mock App Header -->
+        <div style="background: #030712; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div style="font-weight: 700; color: #fff;">⚡ App Navbar</div>
+          <div id="navAuthArea" style="display: flex; align-items: center; gap: 0.8rem;">
+            <button class="btn btn-primary" onclick="loginUser()" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;">Login</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <!-- Route Access Controls -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.5rem;">TEST ROUTE NAVIGATION:</div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <button class="btn btn-secondary" onclick="tryRoute('/public')">Visit Public Route (/)</button>
+              <button class="btn btn-secondary" onclick="tryRoute('/dashboard')">Visit Protected Route (/dashboard)</button>
+            </div>
+
+            <div style="margin-top: 1rem; background: #060911; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div style="font-size: 0.75rem; color: var(--text-faint);">LOCALSTORAGE SNAPSHOT:</div>
+              <div id="storageDisplay" style="font-family: var(--font-mono); font-size: 0.8rem; color: #38bdf8; margin-top: 0.3rem;">
+                token: null
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen Output -->
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0.5rem;">ACTIVE SCREEN RENDERED:</div>
+            <div id="screenOutput" style="background: #030712; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); min-height: 140px; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+              <h4 style="color: #fff;">Public Home Page</h4>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Everyone can view this page without logging in.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The Protected Route Flow</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+flowchart TD
+    User[User navigates to /dashboard] --> Guard{<ProtectedRoute>}
+    Guard -->|AuthContext: user exists| Allow[Render <DashboardPage />]
+    Guard -->|AuthContext: user is null| Deny["<Navigate to='/login' replace />"]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        client/src/<br>
+        ├── context/<br>
+        │   └── <span class="highlight">AuthContext.jsx</span> <span class="desc">← createContext, AuthProvider, useAuth hook</span><br>
+        ├── components/<br>
+        │   ├── <span class="highlight">ProtectedRoute.jsx</span> <span class="desc">← Gatekeeper: checks user ? children : Navigate</span><br>
+        │   └── Navbar.jsx <span class="desc">← Conditionally displays Login vs Logout buttons</span><br>
+        └── pages/<br>
+            ├── LoginPage.jsx <span class="desc">← Calls login(token) and sets localStorage</span><br>
+            └── <span class="highlight">Dashboard.jsx</span> <span class="desc">← Wrapped inside &lt;ProtectedRoute&gt;</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Global Auth Context & Route Guard</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt13')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt13">I am building a React application with `react-router-dom` (v6).
+Please create a production-ready Authentication Context and Protected Route:
+
+1. `client/src/context/AuthContext.jsx`:
+   - Initialize `user` state by checking `localStorage.getItem('token')`.
+   - Provide `login(token, userData)`: saves to localStorage and sets state.
+   - Provide `logout()`: removes from localStorage and clears state.
+   - Export a custom `useAuth()` hook for easy consumption.
+
+2. `client/src/components/ProtectedRoute.jsx`:
+   - Use `useAuth()`. If `user` is not authenticated, redirect to `/login` using `<Navigate to="/login" replace />`.
+   - Otherwise, render `{children}`.
+
+3. Show how to wrap `/dashboard` inside `<ProtectedRoute>` in `App.jsx`.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`localStorage`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A persistent key-value storage system built into the browser that retains saved data (like JWT tokens) even after closing or refreshing the tab.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Prop Drilling</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The awkward, error-prone process of passing props down through many layers of intermediate child components that don't actually need the data themselves.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">React Context API</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A built-in React system that creates a "global broadcasting station", making data (like logged-in user auth) accessible to any component instantly.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`createContext` & `Provider`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">`createContext()` initializes the shared context vault; `<AuthContext.Provider value={...}>` wraps your app and broadcasts data to all children.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Custom Hook (`useAuth`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A user-created helper hook that packages Context consumption into a clean, single-line call: `const { user, logout } = useAuth()`.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Protected Route</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A component wrapper that checks if a user is authenticated; if yes, it renders the private screen; if no, it redirects them to `/login`.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`<Navigate replace />`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A React Router component used inside route guards to immediately redirect unauthorized visitors to a different page.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Context Eliminates Prop Drilling:</strong> Auth state is broadcast globally to all components without passing props down through every layer.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Persistent Sessions:</strong> Saving the token in `localStorage` ensures the user remains authenticated even when refreshing the page or reopening the tab.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Route Gatekeeping:</strong> Wrapping pages in `<ProtectedRoute>` protects user privacy by redirecting unauthorized visitors to `/login`.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let currentUser = null;
+
+    function loginUser() {
+      currentUser = { name: "Sarah Connor", email: "sarah@resistance.org" };
+      updateAuthUI();
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      updateAuthUI();
+      tryRoute('/public');
+    }
+
+    function updateAuthUI() {
+      const navArea = document.getElementById('navAuthArea');
+      const storage = document.getElementById('storageDisplay');
+
+      if (currentUser) {
+        navArea.innerHTML = `
+          <span style="font-size: 0.85rem; color: #10b981;">👤 ${currentUser.name}</span>
+          <button class="btn btn-secondary" onclick="logoutUser()" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;">Logout</button>
+        `;
+        storage.innerHTML = `token: <span style="color: #10b981;">"eyJhbGciOiJIUzI1..."</span><br>user: <span style="color: #cbd5e1;">{"name":"Sarah Connor"}</span>`;
+      } else {
+        navArea.innerHTML = `
+          <button class="btn btn-primary" onclick="loginUser()" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;">Login</button>
+        `;
+        storage.innerHTML = `token: <span style="color: #f43f5e;">null</span>`;
+      }
+    }
+
+    function tryRoute(path) {
+      const screen = document.getElementById('screenOutput');
+      if (path === '/public') {
+        screen.innerHTML = `
+          <h4 style="color: #fff;">Public Home Page (/)</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Everyone can view this page without logging in.</p>
+        `;
+      } else if (path === '/dashboard') {
+        if (currentUser) {
+          screen.innerHTML = `
+            <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1rem; border-radius: 8px;">
+              <h4 style="color: #10b981;">🔒 Private User Dashboard</h4>
+              <p style="color: #fff; font-size: 0.85rem; margin-top: 0.3rem;">Welcome back, ${currentUser.name}! You are authenticated.</p>
+            </div>
+          `;
+        } else {
+          screen.innerHTML = `
+            <div style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); padding: 1rem; border-radius: 8px;">
+              <h4 style="color: #f43f5e;">🚫 Access Denied!</h4>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">ProtectedRoute intercepted: Redirecting to <code>/login</code>...</p>
+            </div>
+          `;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

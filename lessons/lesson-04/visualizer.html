@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 04 | Backend Mental Model & Express</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    .screen-window {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+    .window-header {
+      background: #0f1523;
+      padding: 0.5rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .window-dots { display: flex; gap: 6px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    /* Code line active glow */
+    .code-line {
+      display: flex;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .code-line.active-line {
+      background: rgba(99, 102, 241, 0.25);
+      border-left: 3px solid var(--accent-cyan);
+    }
+    .line-num {
+      width: 25px;
+      color: #475569;
+      user-select: none;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">04</div>
+      <span>Lesson 04: Express & Server Model</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-03/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 03</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-05/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 05 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-backend">Module 2 &bull; Class 04 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">The Backend Mental Model (Node & Express)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Experience how an Express server listens on ports, parses JSON bodies with middleware, and responds to incoming requests.
+      </p>
+    </div>
+
+    <!-- Flagship Visual Simulator -->
+    <div class="section-block">
+      <h2>⚙️ The Dual-Cockpit Express Simulator</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Observe live code line execution in VS Code alongside real Node terminal outputs and client response data:
+      </p>
+
+      <div class="sim-container">
+        <!-- Controls -->
+        <div class="sim-controls">
+          <button id="bootBtn" class="btn btn-primary" onclick="bootServer()">1. Start Node Server (node server.js)</button>
+          <button id="hitBtn1" class="btn btn-secondary" onclick="hitRoute('/api/health')" disabled>2. Test GET /api/health</button>
+          <button id="hitBtn2" class="btn btn-secondary" onclick="hitRoute('/api/echo')" disabled>3. Test POST /api/echo (with JSON)</button>
+          <button class="btn btn-secondary" onclick="resetServer()">↺ Reset</button>
+          <span id="portStatusBadge" style="font-size: 0.8rem; font-weight: 700; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 4px 8px; border-radius: 4px;">
+            PORT 5000: CLOSED
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 1rem; margin-top: 1.25rem;">
+          
+          <!-- Screen 1: VS Code Editor -->
+          <div class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span>📝 VS Code - server.js</span>
+              <span style="color: var(--accent-indigo);">UTF-8</span>
+            </div>
+
+            <div style="background: #030712; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; color: #cbd5e1; flex: 1; min-height: 240px; line-height: 1.7;">
+              <div id="l1" class="code-line"><span class="line-num">1</span><span><span style="color: #f43f5e;">const</span> express = <span style="color: #38bdf8;">require</span>(<span style="color: #10b981;">'express'</span>);</span></div>
+              <div id="l2" class="code-line"><span class="line-num">2</span><span><span style="color: #f43f5e;">const</span> app = <span style="color: #6366f1;">express</span>();</span></div>
+              <div id="l3" class="code-line"><span class="line-num">3</span><span><span style="color: #f43f5e;">const</span> PORT = 5000;</span></div>
+              <div id="l4" class="code-line"><span class="line-num">4</span><span></span></div>
+              <div id="l5" class="code-line"><span class="line-num">5</span><span><span style="color: #64748b;">// 1. Middleware parses JSON</span></span></div>
+              <div id="l6" class="code-line"><span class="line-num">6</span><span>app.<span style="color: #38bdf8;">use</span>(express.<span style="color: #6366f1;">json</span>());</span></div>
+              <div id="l7" class="code-line"><span class="line-num">7</span><span></span></div>
+              <div id="l8" class="code-line"><span class="line-num">8</span><span><span style="color: #64748b;">// 2. Health Route</span></span></div>
+              <div id="l9" class="code-line"><span class="line-num">9</span><span>app.<span style="color: #38bdf8;">get</span>(<span style="color: #10b981;">'/api/health'</span>, (req, res) => {</span></div>
+              <div id="l10" class="code-line"><span class="line-num">10</span><span>&nbsp;&nbsp;res.<span style="color: #38bdf8;">json</span>({ status: <span style="color: #10b981;">'online'</span> });</span></div>
+              <div id="l11" class="code-line"><span class="line-num">11</span><span>});</span></div>
+              <div id="l12" class="code-line"><span class="line-num">12</span><span></span></div>
+              <div id="l13" class="code-line"><span class="line-num">13</span><span><span style="color: #64748b;">// 3. Port Listener</span></span></div>
+              <div id="l14" class="code-line"><span class="line-num">14</span><span>app.<span style="color: #38bdf8;">listen</span>(PORT, () => console.<span style="color: #38bdf8;">log</span>(<span style="color: #10b981;">\`Ready\`</span>));</span></div>
+            </div>
+          </div>
+
+          <!-- Screen 2: Terminal Console -->
+          <div class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span>⚙️ Node Terminal (PID: 8842)</span>
+              <span>bash</span>
+            </div>
+
+            <div id="termLog" style="background: #030712; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.74rem; color: #94a3b8; flex: 1; min-height: 240px; line-height: 1.6; overflow-y: auto;">
+              $ node server.js<br>
+              <span style="color: var(--text-faint);">[Server process stopped. Click Button 1 to boot]</span>
+            </div>
+          </div>
+
+          <!-- Screen 3: Client Response -->
+          <div class="screen-window">
+            <div class="window-header">
+              <div class="window-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span>📡 Client Inspector (Port 5000)</span>
+              <span id="resStatusBadge" style="color: var(--text-faint);">-</span>
+            </div>
+
+            <div style="background: #060911; padding: 0.8rem; font-family: var(--font-mono); font-size: 0.74rem; color: #cbd5e1; flex: 1; min-height: 240px; display: flex; flex-direction: column;">
+              <div style="font-size: 0.7rem; color: var(--text-faint); margin-bottom: 0.3rem;">HTTP RESPONSE BODY:</div>
+              <div id="clientRes" style="background: #030712; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.8rem; flex: 1; color: #38bdf8; overflow-y: auto;">
+                // Response will appear here...
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid Architecture -->
+    <div class="section-block">
+      <h2>📐 The Request-Response Lifecycle</h2>
+      <div class="diagram-box">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant Client as Browser / Postman
+    participant Port as Port 5000 Listener
+    participant Middle as express.json()
+    participant Handler as Route Controller
+
+    Client->>Port: GET /api/health
+    Port->>Middle: Passes raw HTTP stream
+    Note over Middle: Translates request headers & body
+    Middle->>Handler: Passes clean (req, res) objects
+    Note over Handler: Executes res.json({ status: "ok" })
+    Handler-->>Client: Returns HTTP 200 OK + JSON
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <div class="file-tree">
+        backend/<br>
+        ├── <span class="highlight">server.js</span> <span class="desc">← Entry point: sets up app, loads middleware, listens to port</span><br>
+        ├── <span>package.json</span> <span class="desc">← Defines "start": "node server.js" and dependencies</span><br>
+        └── <span>node_modules/</span> <span class="desc">← Express and supporting engine code</span>
+      </div>
+    </div>
+
+    <!-- Copyable Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Create a Clean Express Server</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt4')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt4">I am building the backend for a MERN stack application.
+Please write a clean, modern `server.js` file using Express.
+
+Requirements:
+- Listen on PORT 5000 (or `process.env.PORT`).
+- Use `express.json()` middleware to parse JSON bodies.
+- Create a test route: `GET /api/health` that returns `{ status: "ok", timestamp: new Date() }`.
+- Print a clear console log when the server starts successfully: "Server listening on port 5000".
+- Explain the 3 most important lines in this file.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Runtime Environment</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The engine and ecosystem that executes code. Node.js is a server-side runtime, while V8 in Chrome is a browser-side runtime.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Port</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A numbered software doorway on your computer (e.g. 5000 or 5173) where specific network programs listen for incoming internet traffic.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Express.js</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A minimalist, fast web server framework for Node.js that simplifies routing, middleware, and request handling.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Request (`req`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The object provided by Express containing everything the user sent: URL parameters, query strings, headers, and request body payload.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Response (`res`)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The object provided by Express used to craft and send the reply back to the user: setting status codes (`res.status(200)`) and JSON data (`res.json(...)`).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Middleware</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A helper function that intercepts an incoming request before it reaches your final route handler, often used for parsing data, logging, or checking passwords.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">`express.json()`</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A mandatory built-in Express middleware that translates incoming raw JSON text streams into a ready-to-use JavaScript `req.body` object.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Nodemon</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A developer utility that automatically restarts your Node server whenever you save changes in your code, saving you from manually restarting it in the terminal.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>What is a Port?</strong> A numbered doorway (like 5000) on your operating system where incoming requests are received.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>The Role of `req` and `res`:</strong> `req` contains the user's data; `res` sends the server's reply.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Why `express.json()` is mandatory:</strong> Without it, Express cannot read JSON payloads sent in POST requests and `req.body` will be `undefined`.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    let isServerUp = false;
+
+    function resetServer() {
+      isServerUp = false;
+      document.getElementById('bootBtn').disabled = false;
+      document.getElementById('hitBtn1').disabled = true;
+      document.getElementById('hitBtn2').disabled = true;
+      document.getElementById('portStatusBadge').innerText = 'PORT 5000: CLOSED';
+      document.getElementById('portStatusBadge').style.color = '#ef4444';
+      document.getElementById('portStatusBadge').style.borderColor = 'rgba(239,68,68,0.3)';
+      document.getElementById('termLog').innerHTML = `$ node server.js<br><span style="color: var(--text-faint);">[Server process stopped]</span>`;
+      document.getElementById('clientRes').innerHTML = '// Response will appear here...';
+      document.getElementById('resStatusBadge').innerText = '-';
+      clearLines();
+    }
+
+    function bootServer() {
+      isServerUp = true;
+      document.getElementById('bootBtn').disabled = true;
+      document.getElementById('hitBtn1').disabled = false;
+      document.getElementById('hitBtn2').disabled = false;
+
+      highlightLine('l14');
+      const badge = document.getElementById('portStatusBadge');
+      badge.innerText = 'PORT 5000: LISTENING';
+      badge.style.color = '#10b981';
+      badge.style.borderColor = 'rgba(16,185,129,0.3)';
+
+      const term = document.getElementById('termLog');
+      term.innerHTML = `
+$ node server.js<br>
+<span style="color: #10b981;">[READY] Express v4.19 active</span><br>
+<span style="color: #38bdf8;">[LISTENER] Bound to 0.0.0.0:5000</span><br>
+<span style="color: #a5b4fc;">[SOCKET] TCP Handshake listener initialized.</span>
+      `;
+    }
+
+    function clearLines() {
+      for (let i = 1; i <= 14; i++) {
+        const el = document.getElementById('l' + i);
+        if (el) el.classList.remove('active-line');
+      }
+    }
+
+    function highlightLine(id) {
+      clearLines();
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active-line');
+    }
+
+    function hitRoute(route) {
+      if (!isServerUp) return;
+      const term = document.getElementById('termLog');
+      const res = document.getElementById('clientRes');
+      const badge = document.getElementById('resStatusBadge');
+
+      if (route === '/api/health') {
+        highlightLine('l6');
+        setTimeout(() => highlightLine('l9'), 400);
+        setTimeout(() => highlightLine('l10'), 800);
+
+        term.innerHTML += `<br><span style="color: #10b981;">==> GET /api/health HTTP/1.1</span> - 200 OK (3ms)`;
+        badge.innerHTML = `<span style="color: #10b981; font-weight: 700;">200 OK</span>`;
+        res.innerHTML = `{\n  <span style="color: #f43f5e;">"status"</span>: <span style="color: #10b981;">"online"</span>,\n  <span style="color: #f43f5e;">"uptime"</span>: 42,\n  <span style="color: #f43f5e;">"timestamp"</span>: <span style="color: #f59e0b;">"${new Date().toISOString()}"</span>\n}`;
+      } else {
+        highlightLine('l6');
+        term.innerHTML += `<br><span style="color: #f59e0b;">==> POST /api/echo HTTP/1.1</span> - Body parsed via express.json() - 201 Created`;
+        badge.innerHTML = `<span style="color: #10b981; font-weight: 700;">201 Created</span>`;
+        res.innerHTML = `{\n  <span style="color: #f43f5e;">"received"</span>: true,\n  <span style="color: #f43f5e;">"parsedBody"</span>: {\n    <span style="color: #f43f5e;">"message"</span>: <span style="color: #10b981;">"Hello Server!"</span>\n  }\n}`;
+      }
+    }
+  </script>
+</body>
+</html>

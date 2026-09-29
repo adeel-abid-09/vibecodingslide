@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 02 | Visual Anatomy (HTML & CSS)</title>
+  <link rel="stylesheet" href="../../styles/common.css">
+  <script src="../../scripts/fullscreen.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</head>
+<body>
+
+  <header class="header-bar">
+    <a href="../../index.html" class="logo-badge">
+      <div class="logo-icon">02</div>
+      <span>Lesson 02: Visual Anatomy</span>
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="../lesson-01/visualizer.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">← Lesson 01</a>
+      <a href="../../index.html" class="btn btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Portal</a>
+      <a href="../lesson-03/visualizer.html" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">Lesson 03 →</a>
+    </div>
+  </header>
+
+  <div class="deck-container">
+    
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-tag tag-foundation">Module 1 &bull; Class 02 / 18</span>
+      <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">Visual Anatomy (HTML, CSS & Blueprinting)</h1>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto;">
+        Master the "Everything is a Box" mental model, understand DOM trees, and direct AI to create stunning layouts.
+      </p>
+    </div>
+
+    <!-- Interactive Box Model Explorer -->
+    <div class="section-block">
+      <h2>📦 Interactive Box Model Explorer</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Every single element on a web page is wrapped in 4 nested layers. Use the toggles to see how they behave:
+      </p>
+
+      <div class="sim-container">
+        <div class="sim-controls">
+          <label style="font-size: 0.85rem; color: var(--text-muted);">
+            Padding: <input type="range" id="padSlider" min="5" max="40" value="20" oninput="updateBoxModel()"> <span id="padVal">20px</span>
+          </label>
+          <label style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1rem;">
+            Margin: <input type="range" id="marSlider" min="0" max="40" value="15" oninput="updateBoxModel()"> <span id="marVal">15px</span>
+          </label>
+          <label style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1rem;">
+            Border: <input type="range" id="borSlider" min="1" max="8" value="3" oninput="updateBoxModel()"> <span id="borVal">3px</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: center; padding: 2rem 0; background: #060911; border-radius: 12px; overflow: hidden;">
+          <!-- Margin Layer -->
+          <div id="marginBox" style="background: rgba(245, 158, 11, 0.15); border: 2px dashed rgba(245, 158, 11, 0.5); padding: 15px; border-radius: 8px; transition: all 0.2s;">
+            <div style="font-size: 0.7rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 4px;">MARGIN (Space outside)</div>
+            
+            <!-- Border Layer -->
+            <div id="borderBox" style="background: rgba(139, 92, 246, 0.2); border: 3px solid var(--accent-purple); padding: 20px; border-radius: 6px; transition: all 0.2s;">
+              <div style="font-size: 0.7rem; color: #c4b5fd; font-weight: 700; margin-bottom: 4px;">BORDER (The outline)</div>
+
+              <!-- Padding Layer -->
+              <div id="paddingBox" style="background: rgba(16, 185, 129, 0.2); border: 1px dashed rgba(16, 185, 129, 0.6); padding: 15px; border-radius: 4px; text-align: center;">
+                <div style="font-size: 0.7rem; color: var(--accent-emerald); font-weight: 700; margin-bottom: 4px;">PADDING (Cushion inside)</div>
+
+                <!-- Content Layer -->
+                <div style="background: var(--accent-indigo); color: #fff; padding: 0.8rem 1.5rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem;">
+                  🚀 CONTENT (Text, Image, Button)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mermaid DOM Diagram -->
+    <div class="section-block">
+      <h2>🌳 The DOM Tree: How Browsers Think</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        HTML isn't a mess of random tags—it's a clean family tree:
+      </p>
+      <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    HTML[html Root Tag]
+    HEAD[head: Metadata & Styles]
+    BODY[body: Visible Page]
+    
+    HTML --> HEAD
+    HTML --> BODY
+    
+    NAV[header / nav: Navigation Bar]
+    MAIN[main: Core Content]
+    FOOTER[footer: Footer Links]
+    
+    BODY --> NAV
+    BODY --> MAIN
+    BODY --> FOOTER
+    
+    NAV --> LOGO[Logo & Brand]
+    NAV --> LINKS[Links / Buttons]
+    
+    MAIN --> HERO[Hero Banner]
+    MAIN --> CARDS[3 Column Cards]
+        </pre>
+      </div>
+    </div>
+
+    <!-- File Anatomy -->
+    <div class="section-block">
+      <h2>📂 Today's File Anatomy</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Where pure visual code lives:
+      </p>
+      <div class="file-tree">
+        my-landing-page/<br>
+        ├── <span class="highlight">index.html</span> <span class="desc">← Semantic structure (boxes, headings, buttons, text)</span><br>
+        ├── <span class="highlight">styles.css</span> <span class="desc">← Visual rules (colors, fonts, flexbox layouts, hover animations)</span><br>
+        └── <span>assets/</span> <span class="desc">← Media (logos, photos, SVG icons)</span>
+      </div>
+    </div>
+
+    <!-- Copyable AI Prompt Card -->
+    <div class="section-block">
+      <h2>🤖 Copyable AI Prompt Recipe</h2>
+      <p style="color: var(--text-muted); margin-bottom: 0.5rem;">
+        Teach students how to direct AI with visual specifications:
+      </p>
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span>Prompt: Blueprinting a Hero Section</span>
+          <button class="copy-btn" onclick="copyPrompt('prompt2')">Copy Prompt</button>
+        </div>
+        <div class="prompt-body" id="prompt2">I am building a modern landing page hero section.
+Generate clean semantic HTML and modern CSS.
+
+Requirements:
+- Dark luxury theme (background: #0a0d14, vibrant indigo/cyan accents).
+- 2-column flexbox layout:
+  - Left column: Pill badge ("New Vibe Coding"), bold H1 title, subtext paragraph, and 2 CTA buttons ("Get Started" and "View Demo").
+  - Right column: A glassmorphic card previewing a code editor with glowing borders.
+- Responsive for mobile screens (collapses into 1 column on mobile).
+- Use Google Font 'Inter'.
+Output HTML and CSS in clean separate blocks.</div>
+      </div>
+    </div>
+
+    
+    <!-- Vocabulary & Critical Terminologies Deck -->
+    <div class="section-block">
+      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Essential technical jargon explained in plain English for beginners:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">DOM (Document Object Model)</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The browser's internal family tree representation of all the HTML elements on a webpage, which JavaScript can dynamically read and manipulate.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Semantic HTML</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Using meaningful tags (like <header>, <nav>, <main>, <button>) that clearly describe their purpose to browsers, search engines, and screen readers, rather than just generic <div> tags.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">The Box Model</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The fundamental CSS rule that every element is a rectangular box made of 4 layers: Content (text/image), Padding (cushion inside), Border (frame), and Margin (spacing outside).</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Flexbox</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A CSS layout tool designed to easily distribute space and align boxes horizontally in a row or vertically in a column with simple commands.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Responsive Design</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Building webpages that automatically adapt, shrink, expand, and reorganize cleanly across desktop monitors, tablets, and mobile phones.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CSS Selectors</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Patterns used to target specific HTML elements for styling (e.g. tag selectors, .class selectors, and #id selectors).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section-block">
+      <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <ul class="takeaways-list">
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Everything is a Box:</strong> Web layout is simply nesting smaller boxes inside bigger parent boxes.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Margin vs Padding:</strong> Margin pushes <em>outside</em> elements away; Padding adds cushion <em>inside</em> the box.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>Flexbox Alignment:</strong> `display: flex` with `justify-content` and `align-items` is how 95% of modern web layouts are aligned horizontally and vertically.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    function updateBoxModel() {
+      const p = document.getElementById('padSlider').value;
+      const m = document.getElementById('marSlider').value;
+      const b = document.getElementById('borSlider').value;
+
+      document.getElementById('padVal').innerText = p + 'px';
+      document.getElementById('marVal').innerText = m + 'px';
+      document.getElementById('borVal').innerText = b + 'px';
+
+      document.getElementById('borderBox').style.padding = p + 'px';
+      document.getElementById('marginBox').style.padding = m + 'px';
+      document.getElementById('borderBox').style.borderWidth = b + 'px';
+    }
+  </script>
+</body>
+</html>
