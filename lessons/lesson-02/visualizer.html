@@ -10,6 +10,129 @@
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
   </script>
+  <style>
+    .term-card {
+      background: rgba(22, 30, 46, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .term-card:hover {
+      border-color: var(--accent-indigo);
+      background: rgba(28, 39, 61, 0.85);
+      transform: translateY(-2px);
+    }
+    .term-badge {
+      align-self: flex-start;
+      font-size: 0.68rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-html { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); }
+    .badge-box { background: rgba(245, 158, 11, 0.15); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-flex { background: rgba(99, 102, 241, 0.15); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .badge-css { background: rgba(6, 182, 212, 0.15); color: #a5f3fc; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-ui { background: rgba(16, 185, 129, 0.15); color: #a7f3d0; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    .analogy-box {
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 0.45rem 0.7rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.76rem;
+      color: #94a3b8;
+    }
+
+    .code-pill {
+      background: #060911;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent-indigo);
+      color: #ffffff;
+      border-color: var(--accent-indigo);
+    }
+
+    /* Flow Lab styles */
+    .flow-preview-canvas {
+      background: #060911;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      min-height: 220px;
+      font-size: 0.95rem;
+      line-height: 2.2;
+      color: var(--text-muted);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .flow-item {
+      color: #fff;
+      font-weight: 600;
+      border-radius: 6px;
+      text-align: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      user-select: none;
+      vertical-align: middle;
+    }
+    .flow-item-a {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(14, 116, 144, 0.9));
+      border: 1px solid rgba(6, 182, 212, 0.6);
+    }
+    .flow-item-b {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(67, 56, 202, 0.9));
+      border: 1px solid rgba(99, 102, 241, 0.6);
+    }
+    .flow-item-c {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(4, 120, 87, 0.9));
+      border: 1px solid rgba(16, 185, 129, 0.6);
+    }
+    .flow-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .flow-summary-card {
+      background: rgba(22, 30, 46, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.1rem;
+      transition: all 0.2s;
+    }
+    .flow-summary-card:hover {
+      border-color: var(--accent-indigo);
+      background: rgba(28, 39, 61, 0.7);
+    }
+  </style>
 </head>
 <body>
 
@@ -37,31 +160,43 @@
 
     <!-- Interactive Box Model Explorer -->
     <div class="section-block">
-      <h2>📦 Interactive Box Model Explorer</h2>
+      <h2>📦 Interactive Box Model & Sizing Explorer</h2>
       <p style="color: var(--text-muted); margin-bottom: 1rem;">
-        Every single element on a web page is wrapped in 4 nested layers. Use the toggles to see how they behave:
+        Every single element on a web page is wrapped in 4 nested layers. Toggle sizing modes and adjust sliders to see the math in action:
       </p>
 
       <div class="sim-container">
-        <div class="sim-controls">
-          <label style="font-size: 0.85rem; color: var(--text-muted);">
-            Padding: <input type="range" id="padSlider" min="5" max="40" value="20" oninput="updateBoxModel()"> <span id="padVal">20px</span>
-          </label>
-          <label style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1rem;">
-            Margin: <input type="range" id="marSlider" min="0" max="40" value="15" oninput="updateBoxModel()"> <span id="marVal">15px</span>
-          </label>
-          <label style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1rem;">
-            Border: <input type="range" id="borSlider" min="1" max="8" value="3" oninput="updateBoxModel()"> <span id="borVal">3px</span>
-          </label>
+        <div class="sim-controls" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Padding: <input type="range" id="padSlider" min="5" max="40" value="20" oninput="updateBoxModel()"> <span id="padVal">20px</span>
+            </label>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Margin: <input type="range" id="marSlider" min="0" max="40" value="15" oninput="updateBoxModel()"> <span id="marVal">15px</span>
+            </label>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Border: <input type="range" id="borSlider" min="1" max="8" value="3" oninput="updateBoxModel()"> <span id="borVal">3px</span>
+            </label>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Sizing Mode:</span>
+            <button id="borderBoxBtn" class="filter-btn active" onclick="setBoxSizing('border-box')">border-box (Modern)</button>
+            <button id="contentBoxBtn" class="filter-btn" onclick="setBoxSizing('content-box')">content-box (Legacy)</button>
+          </div>
         </div>
 
-        <div style="display: flex; justify-content: center; padding: 2rem 0; background: #060911; border-radius: 12px; overflow: hidden;">
+        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 0.8rem 1rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 0.82rem;">
+          <span style="color: var(--accent-cyan);" id="calcFormula">Formula: Total Width = 280px (Locked by border-box)</span>
+          <span style="color: var(--accent-amber);" id="boxSizingBadge">Active Rule: box-sizing: border-box</span>
+        </div>
+
+        <div style="display: flex; justify-content: center; padding: 2rem 0; background: #060911; border-radius: 12px; overflow: hidden; margin-top: 1rem;">
           <!-- Margin Layer -->
           <div id="marginBox" style="background: rgba(245, 158, 11, 0.15); border: 2px dashed rgba(245, 158, 11, 0.5); padding: 15px; border-radius: 8px; transition: all 0.2s;">
             <div style="font-size: 0.7rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 4px;">MARGIN (Space outside)</div>
             
             <!-- Border Layer -->
-            <div id="borderBox" style="background: rgba(139, 92, 246, 0.2); border: 3px solid var(--accent-purple); padding: 20px; border-radius: 6px; transition: all 0.2s;">
+            <div id="borderBox" style="background: rgba(139, 92, 246, 0.2); border: 3px solid var(--accent-purple); padding: 20px; border-radius: 6px; transition: all 0.2s; width: 280px;">
               <div style="font-size: 0.7rem; color: #c4b5fd; font-weight: 700; margin-bottom: 4px;">BORDER (The outline)</div>
 
               <!-- Padding Layer -->
@@ -69,12 +204,128 @@
                 <div style="font-size: 0.7rem; color: var(--accent-emerald); font-weight: 700; margin-bottom: 4px;">PADDING (Cushion inside)</div>
 
                 <!-- Content Layer -->
-                <div style="background: var(--accent-indigo); color: #fff; padding: 0.8rem 1.5rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem;">
+                <div style="background: var(--accent-indigo); color: #fff; padding: 0.8rem 1rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
                   🚀 CONTENT (Text, Image, Button)
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Flow Lab: Block vs. Inline vs. Inline-Block -->
+    <div class="section-block">
+      <h2>📐 Interactive Flow Lab: Block vs. Inline vs. Inline-Block</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Experience how the browser naturally stacks or flows elements. Toggle display modes and adjust dimensions to watch how line breaks and sizing change in real time:
+      </p>
+
+      <div class="sim-container">
+        <!-- Controls -->
+        <div class="sim-controls" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+          <!-- Mode Switcher -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">Display Mode:</span>
+            <button id="modeBlockBtn" class="filter-btn active" onclick="setFlowMode('block')">⏹️ Block (Stacked)</button>
+            <button id="modeInlineBtn" class="filter-btn" onclick="setFlowMode('inline')">🔤 Inline (Flow)</button>
+            <button id="modeInlineBlockBtn" class="filter-btn" onclick="setFlowMode('inline-block')">🔲 Inline-Block (Hybrid)</button>
+          </div>
+
+          <!-- Dimension Sliders -->
+          <div style="display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center;">
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Width: <input type="range" id="flowWidthSlider" min="80" max="280" value="160" oninput="updateFlowLab()">
+              <span id="flowWidthVal" style="font-family: var(--font-mono); color: var(--accent-cyan);">160px</span>
+            </label>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Height: <input type="range" id="flowHeightSlider" min="30" max="90" value="45" oninput="updateFlowLab()">
+              <span id="flowHeightVal" style="font-family: var(--font-mono); color: var(--accent-cyan);">45px</span>
+            </label>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">
+              Margin: <input type="range" id="flowMarginSlider" min="0" max="25" value="8" oninput="updateFlowLab()">
+              <span id="flowMarginVal" style="font-family: var(--font-mono); color: var(--accent-amber);">8px</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Live Status Bar -->
+        <div id="flowStatusBar" style="background: rgba(0,0,0,0.35); border-radius: 8px; padding: 0.8rem 1.2rem; margin: 1rem 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.82rem; border-left: 3px solid var(--accent-indigo);">
+          <span id="flowCodeFeedback" style="color: var(--text-main);">CSS: .box { display: block; width: 160px; height: 45px; margin: 8px; }</span>
+          <span id="flowNoticeBadge" style="color: var(--accent-cyan); font-weight: 600;">✅ Each element takes its own full line. Width & height respected.</span>
+        </div>
+
+        <!-- Live Visual Interactive Canvas -->
+        <div class="flow-preview-canvas" id="flowCanvas">
+          <div style="color: #64748b; font-size: 0.8rem; margin-bottom: 0.6rem; font-family: var(--font-mono);">
+            // Mock Browser Viewport Stream:
+          </div>
+          <span style="color: var(--text-muted);">Browsers parse content in flow order. When you place elements inside text:</span>
+          
+          <div id="flowBoxA" class="flow-item flow-item-a">
+            📦 Box A (&lt;div&gt;)
+          </div>
+          
+          <div id="flowBoxB" class="flow-item flow-item-b">
+            🚀 Box B (&lt;button&gt;)
+          </div>
+          
+          <div id="flowBoxC" class="flow-item flow-item-c">
+            ✨ Box C (&lt;span&gt;)
+          </div>
+          
+          <span style="color: var(--text-muted);">Notice how this trailing sentence reflows around or underneath based on the active display rule!</span>
+        </div>
+      </div>
+
+      <!-- Comparative Breakdown Cards -->
+      <div class="flow-summary-grid">
+        <div class="flow-summary-card">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+            <span style="font-size: 1.4rem;">🧱</span>
+            <strong style="color: var(--accent-cyan); font-size: 1rem;">display: block</strong>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.6rem;">
+            Demands its own full horizontal line. Automatically pushes subsequent elements down to a new line.
+          </p>
+          <ul style="font-size: 0.78rem; color: #cbd5e1; list-style: none; padding: 0; line-height: 1.8;">
+            <li>✔ Starts on new line: <strong>YES</strong></li>
+            <li>✔ Honors width & height: <strong>YES</strong></li>
+            <li>✔ Vertical margins push neighbors: <strong>YES</strong></li>
+            <li>🏷️ Typical tags: <code style="color: var(--accent-cyan);">&lt;div&gt; &lt;p&gt; &lt;h1-h6&gt; &lt;section&gt;</code></li>
+          </ul>
+        </div>
+
+        <div class="flow-summary-card">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+            <span style="font-size: 1.4rem;">🔤</span>
+            <strong style="color: var(--accent-rose); font-size: 1rem;">display: inline</strong>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.6rem;">
+            Flows like words in a sentence. Tightly wraps content and sits on the same line as neighboring text.
+          </p>
+          <ul style="font-size: 0.78rem; color: #cbd5e1; list-style: none; padding: 0; line-height: 1.8;">
+            <li>❌ Starts on new line: <strong>NO</strong></li>
+            <li>❌ Honors width & height: <strong>IGNORED!</strong></li>
+            <li>❌ Vertical margins push neighbors: <strong>NO!</strong></li>
+            <li>🏷️ Typical tags: <code style="color: var(--accent-rose);">&lt;span&gt; &lt;a&gt; &lt;strong&gt; &lt;code&gt;</code></li>
+          </ul>
+        </div>
+
+        <div class="flow-summary-card">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+            <span style="font-size: 1.4rem;">🏷️</span>
+            <strong style="color: var(--accent-emerald); font-size: 1rem;">display: inline-block</strong>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.6rem;">
+            The best of both worlds: sits side-by-side like text, but retains full box sizing (width, height & vertical margins).
+          </p>
+          <ul style="font-size: 0.78rem; color: #cbd5e1; list-style: none; padding: 0; line-height: 1.8;">
+            <li>❌ Starts on new line: <strong>NO (Side-by-side)</strong></li>
+            <li>✔ Honors width & height: <strong>YES</strong></li>
+            <li>✔ Vertical margins push neighbors: <strong>YES</strong></li>
+            <li>🏷️ Typical tags: <code style="color: var(--accent-emerald);">&lt;button&gt; &lt;input&gt; &lt;img /&gt;</code></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -151,61 +402,335 @@ Output HTML and CSS in clean separate blocks.</div>
       </div>
     </div>
 
-    
-    <!-- Vocabulary & Critical Terminologies Deck -->
+    <!-- Comprehensive Vocabulary & Critical Terminologies Deck -->
     <div class="section-block">
-      <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
-      <p style="color: var(--text-muted); margin-bottom: 1rem;">
-        Essential technical jargon explained in plain English for beginners:
-      </p>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem;">
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">DOM (Document Object Model)</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The browser's internal family tree representation of all the HTML elements on a webpage, which JavaScript can dynamically read and manipulate.</div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; margin-bottom: 1.2rem; gap: 1rem;">
+        <div>
+          <h2>📖 Lesson Vocabulary & Core Terminologies</h2>
+          <p style="color: var(--text-muted); margin-top: 0.25rem;">
+            Every single critical concept and term clearly defined with analogies and syntax:
+          </p>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Semantic HTML</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Using meaningful tags (like <header>, <nav>, <main>, <button>) that clearly describe their purpose to browsers, search engines, and screen readers, rather than just generic <div> tags.</div>
+        <input type="text" id="termSearch" placeholder="🔍 Search terms (e.g. flexbox, border-box, semantic)..." 
+               oninput="filterTerms()" 
+               style="background: #0d121f; border: 1px solid var(--border-color); color: #fff; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; min-width: 280px; outline: none;">
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <button class="filter-btn active" onclick="setCategoryFilter('all', this)">All Terms (28)</button>
+        <button class="filter-btn" onclick="setCategoryFilter('html', this)">HTML & DOM</button>
+        <button class="filter-btn" onclick="setCategoryFilter('box', this)">Box Model & Sizing</button>
+        <button class="filter-btn" onclick="setCategoryFilter('flex', this)">Flexbox & Layout</button>
+        <button class="filter-btn" onclick="setCategoryFilter('css', this)">Selectors & Specificity</button>
+        <button class="filter-btn" onclick="setCategoryFilter('ui', this)">Responsive & Modern UI</button>
+      </div>
+
+      <!-- Term Cards Grid -->
+      <div id="termsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+
+        <!-- 1. HTML -->
+        <div class="term-card" data-category="html" data-keywords="html markup skeleton structure tags">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">HTML (HyperText Markup Language)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The standard markup code that defines the structural skeleton and contents of a web page using tags.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> The framing studs, drywall, and structural walls of an unfurnished house.</div>
+          <div class="code-pill">&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;</div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">The Box Model</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">The fundamental CSS rule that every element is a rectangular box made of 4 layers: Content (text/image), Padding (cushion inside), Border (frame), and Margin (spacing outside).</div>
+
+        <!-- 2. DOM -->
+        <div class="term-card" data-category="html" data-keywords="dom document object model tree memory javascript">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">DOM (Document Object Model)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The browser's in-memory live tree representation of all HTML elements on a webpage, which CSS styles and JavaScript can dynamically read and manipulate.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> The live architectural blueprint that updates immediately when walls are moved.</div>
+          <div class="code-pill">document.querySelector('.card').style.display = 'none';</div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Flexbox</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">A CSS layout tool designed to easily distribute space and align boxes horizontally in a row or vertically in a column with simple commands.</div>
+
+        <!-- 3. Semantic HTML -->
+        <div class="term-card" data-category="html" data-keywords="semantic html tags accessibility seo header nav main section article footer">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Semantic HTML</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Using meaningful tags that clearly describe their purpose to browsers, search engines, and screen readers, rather than generic &lt;div&gt; tags.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Labeling pantry jars "Sugar" and "Flour" instead of "Jar 1" and "Jar 2".</div>
+          <div class="code-pill">&lt;header&gt;, &lt;nav&gt;, &lt;main&gt;, &lt;article&gt;, &lt;footer&gt;</div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">Responsive Design</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Building webpages that automatically adapt, shrink, expand, and reorganize cleanly across desktop monitors, tablets, and mobile phones.</div>
+
+        <!-- 4. Div Soup -->
+        <div class="term-card" data-category="html" data-keywords="div soup anti pattern bad practice generic tags">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">"Div Soup" (Anti-Pattern)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">An unmaintainable mess created by nesting dozens of anonymous &lt;div&gt; tags without semantic meaning, breaking accessibility and confusing AI code refactorers.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A book with no chapter titles, paragraphs, or headings—just one huge wall of text.</div>
+          <div class="code-pill">&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;Click&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt; ❌</div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.9rem; border-radius: 8px;">
-          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem; margin-bottom: 0.3rem;">CSS Selectors</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Patterns used to target specific HTML elements for styling (e.g. tag selectors, .class selectors, and #id selectors).</div>
+
+        <!-- 5. Block vs Inline -->
+        <div class="term-card" data-category="html" data-keywords="block inline inline-block display flow line breaks">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Block vs. Inline vs. Inline-Block</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Block elements take 100% width on a new line; Inline elements flow within text and ignore width/height; Inline-block sits on the same line but honors dimensions.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A brick taking its own row (Block) vs a highlighted word in a sentence (Inline).</div>
+          <div class="code-pill">display: block | inline | inline-block;</div>
         </div>
+
+        <!-- 6. Viewport Meta -->
+        <div class="term-card" data-category="html" data-keywords="viewport meta tag mobile scaling responsive screen">
+          <span class="term-badge badge-html">HTML & DOM</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Viewport & &lt;meta name="viewport"&gt;</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The visible rectangle of the screen where web content is rendered. The meta tag forces mobile devices to render at their actual screen width rather than zooming out.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Adjusting the zoom on a projector so the movie fits the physical screen.</div>
+          <div class="code-pill">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</div>
+        </div>
+
+        <!-- 7. The Box Model -->
+        <div class="term-card" data-category="box" data-keywords="box model content padding border margin layers">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">The Box Model</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The foundational CSS rule stating every element is a rectangular box made of 4 concentric layers: Content, Padding, Border, and Margin.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Item (Content), Bubble wrap (Padding), Cardboard box (Border), Delivery truck space (Margin).</div>
+          <div class="code-pill">margin ➔ border ➔ padding ➔ content</div>
+        </div>
+
+        <!-- 8. Padding -->
+        <div class="term-card" data-category="box" data-keywords="padding inner cushion space background">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Padding (Interior Cushion)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Clearance space inside the element between the content and the border. Background colors and images extend throughout the padding area.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Inflatable foam or bubble wrap packed inside a shipping box.</div>
+          <div class="code-pill">padding: 1rem 1.5rem; /* top/bottom, left/right */</div>
+        </div>
+
+        <!-- 9. Margin -->
+        <div class="term-card" data-category="box" data-keywords="margin space outside buffer push neighbors">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Margin (Exterior Buffer)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The transparent space outside the border that pushes neighboring elements away, creating breathing room and layout rhythm.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Personal space between passengers sitting on a subway bench.</div>
+          <div class="code-pill">margin: 0 auto; /* Horizontally centers a fixed-width block */</div>
+        </div>
+
+        <!-- 10. Margin Collapse -->
+        <div class="term-card" data-category="box" data-keywords="margin collapse vertical overlap bug quirks">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Margin Collapse</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">A CSS quirk where adjacent vertical margins blend into a single margin equal to the larger of the two, rather than summing together.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Two soap bubbles touching and merging into one shared bubble.</div>
+          <div class="code-pill">box1 margin-bottom: 30px + box2 margin-top: 20px = 30px total!</div>
+        </div>
+
+        <!-- 11. box-sizing: border-box -->
+        <div class="term-card" data-category="box" data-keywords="box-sizing border-box content-box sizing reset golden rule">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">box-sizing: border-box</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Forces width and height to include padding and border inside the declared measurement, preventing cards and grids from unexpectedly breaking.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A rigid suitcase: packing more items compresses inside instead of enlarging the suitcase exterior.</div>
+          <div class="code-pill">*, *::before, *::after { box-sizing: border-box; }</div>
+        </div>
+
+        <!-- 12. Units: Absolute vs Relative -->
+        <div class="term-card" data-category="box" data-keywords="units px rem em vw vh relative absolute responsive">
+          <span class="term-badge badge-box">Box Model</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">CSS Units (px, rem, %, vh, vw)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Fixed absolute units (px) don't scale; Relative units like rem (root HTML font size) and % / vh / vw adapt dynamically to screen size and user zoom settings.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A rigid wooden ruler (px) vs an elastic measuring tape (rem/vw).</div>
+          <div class="code-pill">font-size: 1.25rem; width: 100%; min-height: 100vh;</div>
+        </div>
+
+        <!-- 13. Flexbox -->
+        <div class="term-card" data-category="flex" data-keywords="flexbox display flex 1d layout align distribute">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Flexbox (Flexible Box Layout)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">A 1-dimensional CSS layout model engineered to distribute space and align items effortlessly along a single row or column.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> An elastic clothesline where clothes automatically space themselves evenly.</div>
+          <div class="code-pill">display: flex; /* Powers 95% of modern navbars & card rows */</div>
+        </div>
+
+        <!-- 14. Main Axis vs Cross Axis -->
+        <div class="term-card" data-category="flex" data-keywords="main axis cross axis flex-direction row column">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Main Axis vs. Cross Axis</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The primary flow direction (Main Axis, controlled by flex-direction) and its perpendicular counter-direction (Cross Axis).</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Highway traffic lanes (Main) vs the perpendicular pedestrian overpass (Cross).</div>
+          <div class="code-pill">flex-direction: row (horizontal) | column (vertical)</div>
+        </div>
+
+        <!-- 15. justify-content -->
+        <div class="term-card" data-category="flex" data-keywords="justify-content main axis space-between center alignment">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">justify-content</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Aligns and distributes flex items along the Main Axis (e.g. space-between places the logo on the far left and links on the far right).</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Spreading passengers evenly along a long park bench.</div>
+          <div class="code-pill">justify-content: space-between | center | flex-end;</div>
+        </div>
+
+        <!-- 16. align-items -->
+        <div class="term-card" data-category="flex" data-keywords="align-items cross axis vertical centering center stretch">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">align-items</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Aligns flex items along the Cross Axis. Setting align-items: center is the universal modern way to vertically center elements.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Leveling hanging picture frames so their centers align horizontally.</div>
+          <div class="code-pill">align-items: center | stretch | flex-start;</div>
+        </div>
+
+        <!-- 17. gap -->
+        <div class="term-card" data-category="flex" data-keywords="gap spacing flex grid gutters margins clean">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">gap (Spacing)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Defines clean, uniform spacing between flex or grid items without needing hacky margin resets on the first or last children.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> The uniform walkway space between rows in an airplane.</div>
+          <div class="code-pill">gap: 1.5rem; /* No more :last-child margin hacks! */</div>
+        </div>
+
+        <!-- 18. flex-wrap -->
+        <div class="term-card" data-category="flex" data-keywords="flex-wrap wrapping mobile overflow responsive row">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">flex-wrap</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Determines whether items are forced onto a single horizontal line or allowed to drop onto multiple lines when screen width is constrained.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Sentences automatically wrapping to the next line when reaching page margins.</div>
+          <div class="code-pill">flex-wrap: wrap; /* Prevents mobile horizontal overflow */</div>
+        </div>
+
+        <!-- 19. CSS Grid -->
+        <div class="term-card" data-category="flex" data-keywords="css grid 2d layout columns rows gallery dashboard">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">CSS Grid (2-Dimensional)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">A 2-dimensional layout engine capable of arranging items across rows and columns simultaneously, perfect for card galleries and dashboards.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A spreadsheet table or chessboard with precise X and Y coordinates.</div>
+          <div class="code-pill">display: grid; grid-template-columns: repeat(3, 1fr);</div>
+        </div>
+
+        <!-- 20. CSS Positioning -->
+        <div class="term-card" data-category="flex" data-keywords="position static relative absolute fixed sticky z-index">
+          <span class="term-badge badge-flex">Flexbox & Layout</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">CSS Positioning (relative / absolute / fixed)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Controls how an element is placed. Relative creates an anchor boundary; Absolute hovers relative to that anchor; Fixed pins to the browser window.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Pinned note on a bulletin board (absolute) vs camera HUD overlay (fixed).</div>
+          <div class="code-pill">position: relative; /* parent */ & position: absolute; /* child */</div>
+        </div>
+
+        <!-- 21. Specificity & Cascade -->
+        <div class="term-card" data-category="css" data-keywords="cascade specificity priority conflict override id class tag">
+          <span class="term-badge badge-css">Selectors & Cascade</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">The Cascade & Specificity</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The score calculation browsers use to resolve styling conflicts. Inline styles beat IDs (#), IDs beat Classes (.), and Classes beat HTML tags (div).</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A military chain of command: General overrides Colonel, who overrides Sergeant.</div>
+          <div class="code-pill">#hero (100) > .card (10) > div (1)</div>
+        </div>
+
+        <!-- 22. Class vs ID Selectors -->
+        <div class="term-card" data-category="css" data-keywords="class selector id selector reusable unique dot hash">
+          <span class="term-badge badge-css">Selectors & Cascade</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Class (`.`) vs. ID (`#`) Selectors</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Classes (`.btn`) can be applied to unlimited elements across the page; IDs (`#header`) must be completely unique per page. Professional CSS uses classes for styling.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Team jersey worn by 11 players (Class) vs a single Passport number (ID).</div>
+          <div class="code-pill">.btn-primary { ... } vs #main-nav { ... }</div>
+        </div>
+
+        <!-- 23. Pseudo-Classes -->
+        <div class="term-card" data-category="css" data-keywords="pseudo class hover focus active state interactive">
+          <span class="term-badge badge-css">Selectors & Cascade</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Pseudo-Classes (`:hover`, `:focus`)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Special state keywords attached to selectors that apply styling only when the user interacts with the element (hovering cursor, focusing an input, active clicks).</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A doorbell lighting up only when a finger touches it.</div>
+          <div class="code-pill">button:hover { transform: translateY(-2px); }</div>
+        </div>
+
+        <!-- 24. CSS Variables -->
+        <div class="term-card" data-category="css" data-keywords="css variables custom properties root tokens theming">
+          <span class="term-badge badge-css">Selectors & Cascade</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">CSS Variables (Custom Properties)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Centrally declared tokens prefixed with `--` that allow updating brand colors, fonts, and spacing globally from a single place.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> A master paint swatches card used to paint an entire mansion.</div>
+          <div class="code-pill">:root { --accent: #6366f1; } & color: var(--accent);</div>
+        </div>
+
+        <!-- 25. Responsive Web Design -->
+        <div class="term-card" data-category="ui" data-keywords="responsive web design rwd mobile tablet desktop layout">
+          <span class="term-badge badge-ui">Responsive & UI</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Responsive Web Design (RWD)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The engineering practice of creating pages that gracefully reorganize, resize, and look stunning on smartphones, tablets, laptops, and ultra-wide monitors.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Water poured into a cup becomes the cup; poured into a bowl becomes the bowl.</div>
+          <div class="code-pill">Fluid layouts + Media Queries + Flexible images</div>
+        </div>
+
+        <!-- 26. Media Queries -->
+        <div class="term-card" data-category="ui" data-keywords="media query media breakpoint mobile first conditional css">
+          <span class="term-badge badge-ui">Responsive & UI</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Media Queries (`@media`) & Breakpoints</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Conditional CSS rules that only activate when the browser viewport matches specific pixel widths (e.g. collapsing a 3-column desktop card grid into a 1-column mobile feed).</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Automatic car headlights that switch on only when ambient darkness drops below a set threshold.</div>
+          <div class="code-pill">@media (max-width: 768px) { flex-direction: column; }</div>
+        </div>
+
+        <!-- 27. Glassmorphism -->
+        <div class="term-card" data-category="ui" data-keywords="glassmorphism backdrop-filter blur luxury transparent frosted glass">
+          <span class="term-badge badge-ui">Responsive & UI</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Glassmorphism</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">A premium modern UI trend featuring frosted-glass semi-transparency with backdrop blur and delicate glowing borders.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> Looking at neon lights through a frosted glass window on a rainy night.</div>
+          <div class="code-pill">backdrop-filter: blur(16px); background: rgba(22, 30, 46, 0.7);</div>
+        </div>
+
+        <!-- 28. Blueprinting -->
+        <div class="term-card" data-category="ui" data-keywords="blueprinting wireframe architecture vibe coding ai prompt">
+          <span class="term-badge badge-ui">Responsive & UI</span>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Blueprinting (The Vibe Coder's Superpower)</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">The habit of mentally decomposing a user interface into nested box hierarchies before prompting an AI, guaranteeing accurate code generation on the first shot.</div>
+          <div class="analogy-box">💡 <strong>Analogy:</strong> An architect drafting blueprints before construction workers pour concrete.</div>
+          <div class="code-pill">Header (Row space-between) ➔ Hero (2-col Flex) ➔ Cards (3-col Grid)</div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Key Takeaways -->
+    <!-- Non-Negotiable Key Takeaways -->
     <div class="section-block">
       <h2>✅ The Non-Negotiable Key Takeaways</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Every student must be able to confidently answer these 7 fundamental questions:
+      </p>
       <ul class="takeaways-list">
         <li class="takeaway-item">
           <span class="takeaway-icon">✔</span>
           <div>
-            <strong>Everything is a Box:</strong> Web layout is simply nesting smaller boxes inside bigger parent boxes.
+            <strong>1. The Box Model:</strong> Every element is composed of 4 concentric layers: Content (payload), Padding (inner cushion), Border (outline frame), and Margin (exterior space pushing neighbors away).
           </div>
         </li>
         <li class="takeaway-item">
           <span class="takeaway-icon">✔</span>
           <div>
-            <strong>Margin vs Padding:</strong> Margin pushes <em>outside</em> elements away; Padding adds cushion <em>inside</em> the box.
+            <strong>2. Why `box-sizing: border-box` is Mandatory:</strong> Under legacy `content-box`, padding and borders inflate the outer width, breaking grids. `border-box` locks the total element width to your declared value.
           </div>
         </li>
         <li class="takeaway-item">
           <span class="takeaway-icon">✔</span>
           <div>
-            <strong>Flexbox Alignment:</strong> `display: flex` with `justify-content` and `align-items` is how 95% of modern web layouts are aligned horizontally and vertically.
+            <strong>3. Margin vs. Padding:</strong> Padding adds room <em>inside</em> the box (expanding the background color); Margin creates clear space <em>outside</em> the border.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>4. Flexbox Alignment Mechanics:</strong> `justify-content` distributes items along the <em>Main Axis</em> (flow direction); `align-items` aligns along the <em>Cross Axis</em> (perpendicular direction).
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>5. Stop the "Div Soup":</strong> Use semantic HTML (`<header>`, `<nav>`, `<main>`, `<button>`). It provides accessibility for screen readers, high Google SEO ranking, and enables AI to cleanly refactor your code.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>6. Positioning Anchors:</strong> An element with `position: absolute` hovers outside the document flow and anchors to the nearest ancestor marked with `position: relative`.
+          </div>
+        </li>
+        <li class="takeaway-item">
+          <span class="takeaway-icon">✔</span>
+          <div>
+            <strong>7. Blueprinting Before Prompting:</strong> The secret to high-speed AI engineering is breaking interfaces down into parent containers, flex directions, and padding before asking AI to code.
           </div>
         </li>
       </ul>
@@ -214,16 +739,28 @@ Output HTML and CSS in clean separate blocks.</div>
   </div>
 
   <script>
+    let currentSizing = 'border-box';
+
     function copyPrompt(id) {
       const text = document.getElementById(id).innerText;
       navigator.clipboard.writeText(text);
       alert('Prompt copied to clipboard!');
     }
 
+    function setBoxSizing(mode) {
+      currentSizing = mode;
+      document.getElementById('borderBoxBtn').classList.toggle('active', mode === 'border-box');
+      document.getElementById('contentBoxBtn').classList.toggle('active', mode === 'content-box');
+      document.getElementById('borderBox').style.boxSizing = mode;
+      document.getElementById('boxSizingBadge').innerText = `Active Rule: box-sizing: ${mode}`;
+      updateBoxModel();
+    }
+
     function updateBoxModel() {
-      const p = document.getElementById('padSlider').value;
-      const m = document.getElementById('marSlider').value;
-      const b = document.getElementById('borSlider').value;
+      const p = parseInt(document.getElementById('padSlider').value, 10);
+      const m = parseInt(document.getElementById('marSlider').value, 10);
+      const b = parseInt(document.getElementById('borSlider').value, 10);
+      const declaredWidth = 280;
 
       document.getElementById('padVal').innerText = p + 'px';
       document.getElementById('marVal').innerText = m + 'px';
@@ -232,7 +769,138 @@ Output HTML and CSS in clean separate blocks.</div>
       document.getElementById('borderBox').style.padding = p + 'px';
       document.getElementById('marginBox').style.padding = m + 'px';
       document.getElementById('borderBox').style.borderWidth = b + 'px';
+
+      const formulaEl = document.getElementById('calcFormula');
+      if (currentSizing === 'border-box') {
+        formulaEl.innerText = `Formula: Total Width = ${declaredWidth}px (Locked by border-box | Content shrinks to ${declaredWidth - 2*p - 2*b}px)`;
+        formulaEl.style.color = 'var(--accent-cyan)';
+      } else {
+        const total = declaredWidth + 2*p + 2*b;
+        formulaEl.innerText = `Formula: Total Width = ${declaredWidth}px (Width) + ${2*p}px (Padding) + ${2*b}px (Border) = ${total}px (⚠️ Expanded!)`;
+        formulaEl.style.color = 'var(--accent-rose)';
+      }
     }
+
+    function setCategoryFilter(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        if (b.id !== 'borderBoxBtn' && b.id !== 'contentBoxBtn') {
+          b.classList.remove('active');
+        }
+      });
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.term-card');
+      const searchTerm = document.getElementById('termSearch').value.toLowerCase().trim();
+
+      cards.forEach(card => {
+        const matchCategory = category === 'all' || card.getAttribute('data-category') === category;
+        const keywords = card.getAttribute('data-keywords') + ' ' + card.innerText.toLowerCase();
+        const matchSearch = !searchTerm || keywords.includes(searchTerm);
+        
+        card.style.display = (matchCategory && matchSearch) ? 'flex' : 'none';
+      });
+    }
+
+    function filterTerms() {
+      const activeBtn = document.querySelector('.filter-btn.active:not(#borderBoxBtn):not(#contentBoxBtn)');
+      const activeCategory = activeBtn ? activeBtn.getAttribute('onclick').match(/'([^']+)'/)[1] : 'all';
+      const searchTerm = document.getElementById('termSearch').value.toLowerCase().trim();
+
+      const cards = document.querySelectorAll('.term-card');
+      cards.forEach(card => {
+        const matchCategory = activeCategory === 'all' || card.getAttribute('data-category') === activeCategory;
+        const keywords = card.getAttribute('data-keywords') + ' ' + card.innerText.toLowerCase();
+        const matchSearch = !searchTerm || keywords.includes(searchTerm);
+        
+        card.style.display = (matchCategory && matchSearch) ? 'flex' : 'none';
+      });
+    }
+
+    // Flow Lab Logic
+    let currentFlowMode = 'block';
+
+    function setFlowMode(mode) {
+      currentFlowMode = mode;
+      document.getElementById('modeBlockBtn').classList.toggle('active', mode === 'block');
+      document.getElementById('modeInlineBtn').classList.toggle('active', mode === 'inline');
+      document.getElementById('modeInlineBlockBtn').classList.toggle('active', mode === 'inline-block');
+      updateFlowLab();
+    }
+
+    function updateFlowLab() {
+      const w = parseInt(document.getElementById('flowWidthSlider').value, 10);
+      const h = parseInt(document.getElementById('flowHeightSlider').value, 10);
+      const m = parseInt(document.getElementById('flowMarginSlider').value, 10);
+
+      const wValEl = document.getElementById('flowWidthVal');
+      const hValEl = document.getElementById('flowHeightVal');
+      const mValEl = document.getElementById('flowMarginVal');
+      const codeFeedback = document.getElementById('flowCodeFeedback');
+      const noticeBadge = document.getElementById('flowNoticeBadge');
+      const statusBar = document.getElementById('flowStatusBar');
+
+      mValEl.innerText = m + 'px';
+
+      const boxes = [
+        document.getElementById('flowBoxA'),
+        document.getElementById('flowBoxB'),
+        document.getElementById('flowBoxC')
+      ];
+
+      if (currentFlowMode === 'inline') {
+        wValEl.innerHTML = `<span style="text-decoration: line-through; color: var(--text-muted);">${w}px</span> <span style="color: var(--accent-rose); font-size: 0.72rem; font-weight:700;">(IGNORED)</span>`;
+        hValEl.innerHTML = `<span style="text-decoration: line-through; color: var(--text-muted);">${h}px</span> <span style="color: var(--accent-rose); font-size: 0.72rem; font-weight:700;">(IGNORED)</span>`;
+        codeFeedback.innerHTML = `<span style="color: #94a3b8;">CSS:</span> <span style="color: var(--accent-rose); font-weight: 700;">display: inline;</span> <span style="color: var(--text-faint); text-decoration: line-through;">width: ${w}px; height: ${h}px;</span> margin: ${m}px;`;
+        noticeBadge.innerHTML = `⚠️ Width & Height IGNORED! Elements only wrap text. Vertical margins don't push lines.`;
+        noticeBadge.style.color = 'var(--accent-rose)';
+        statusBar.style.borderLeftColor = 'var(--accent-rose)';
+
+        boxes.forEach(box => {
+          box.style.display = 'inline';
+          box.style.width = 'auto';
+          box.style.height = 'auto';
+          box.style.lineHeight = 'normal';
+          box.style.padding = '0.25rem 0.6rem';
+          box.style.margin = `${m}px`;
+        });
+      } else if (currentFlowMode === 'block') {
+        wValEl.innerText = w + 'px';
+        hValEl.innerText = h + 'px';
+        codeFeedback.innerHTML = `<span style="color: #94a3b8;">CSS:</span> <span style="color: var(--accent-cyan); font-weight: 700;">display: block;</span> width: ${w}px; height: ${h}px; margin: ${m}px 0;`;
+        noticeBadge.innerHTML = `✔ Each element takes its own full line. Width & height fully respected.`;
+        noticeBadge.style.color = 'var(--accent-cyan)';
+        statusBar.style.borderLeftColor = 'var(--accent-cyan)';
+
+        boxes.forEach(box => {
+          box.style.display = 'block';
+          box.style.width = w + 'px';
+          box.style.height = h + 'px';
+          box.style.lineHeight = h + 'px';
+          box.style.padding = '0';
+          box.style.margin = `${m}px 0`;
+        });
+      } else { // inline-block
+        wValEl.innerText = w + 'px';
+        hValEl.innerText = h + 'px';
+        codeFeedback.innerHTML = `<span style="color: #94a3b8;">CSS:</span> <span style="color: var(--accent-emerald); font-weight: 700;">display: inline-block;</span> width: ${w}px; height: ${h}px; margin: ${m}px;`;
+        noticeBadge.innerHTML = `✨ Sits side-by-side like words, BUT keeps full width, height & margins!`;
+        noticeBadge.style.color = 'var(--accent-emerald)';
+        statusBar.style.borderLeftColor = 'var(--accent-emerald)';
+
+        boxes.forEach(box => {
+          box.style.display = 'inline-block';
+          box.style.width = w + 'px';
+          box.style.height = h + 'px';
+          box.style.lineHeight = h + 'px';
+          box.style.padding = '0';
+          box.style.margin = `${m}px`;
+        });
+      }
+    }
+
+    // Initialize on load
+    updateBoxModel();
+    updateFlowLab();
   </script>
 </body>
 </html>
