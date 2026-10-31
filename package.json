@@ -1,0 +1,8 @@
+{
+  "name": "vibecodingslide",
+  "version": "1.0.0",
+  "description": "AI-Native MERN Stack Bootcamp Slides and Visualizers",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
